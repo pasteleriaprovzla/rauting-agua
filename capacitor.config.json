@@ -1,0 +1,12 @@
+{
+  "appId": "com.aguarutas.app",
+  "appName": "Agua Rutas",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true
+  }
+}
