@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Agua Rutas</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6f8;overflow:hidden}
+  body{display:flex;flex-direction:column}
+  header{background:#0a6cb8;color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+  header h1{font-size:16px;font-weight:600}
+  .role-toggle{background:rgba(255,255,255,.2);border:0;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+  main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  #map{flex:1;min-height:150px}
+  #panel{background:#fff;border-top:1px solid #e0e0e0;padding:12px;max-height:55vh;overflow-y:auto;flex-shrink:0}
+  h3{font-size:13px;margin-bottom:8px;color:#333}
+  h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#888;margin:12px 0 6px}
+  .card{background:#f9f9f9;border:1px solid #e5e5e5;border-radius:8px;padding:10px;margin-bottom:8px}
+  .card h3{font-size:13px;margin-bottom:3px}
+  .card p{font-size:11px;color:#666;margin-bottom:3px}
+  button{font-family:inherit}
+  .btn{background:#0a6cb8;color:#fff;border:0;padding:10px 14px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;width:100%;margin-top:6px}
+  .btn.success{background:#1e9e5b}
+  .btn.danger{background:#d64545}
+  .btn.ghost{background:#e8eef4;color:#0a6cb8}
+  .input-row{display:flex;gap:6px;margin-bottom:6px}
+  .input-row input{flex:1;padding:9px;border:1px solid #ccc;border-radius:6px;font-size:13px}
+  .input-row .btn{width:auto;margin-top:0;padding:9px 14px}
+  .badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;color:#fff;margin-left:4px;vertical-align:middle}
+  .badge.disponible{background:#1e9e5b}
+  .badge.ocupado{background:#d64545}
+  .empty{color:#999;font-size:12px;font-style:italic;padding:6px 0}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:85%;text-align:center}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <h1>💧 Agua Rutas</h1>
+  <button id="roleBtn" class="role-toggle">Admin</button>
+</header>
+<main>
+  <div id="map"></div>
+  <div id="panel"></div>
+</main>
+<div id="toast" class="toast"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const App = {
+  state: {
+    role: 'admin',
+    jobs: [], drivers: [], myDriverId: null,
+    map: null, jobMarkers: {}, driverMarkers: {},
+  },
+
+  async init() {
+    this.loadState();
+    this.initMap();
+    document.getElementById('roleBtn').onclick = () => this.toggleRole();
+    this.render();
+    this.refreshMarkers();
+    this.setupDeepLinks();
+    this.checkLaunchUrl();
+    this.detectMyDriver();
+  },
+
+  // ---------- Storage ----------
+  loadState() {
+    try {
+      const d = JSON.parse(localStorage.getItem('aguaRutas') || '{}');
+      this.state.jobs = d.jobs || [];
+      this.state.drivers = d.drivers || [];
+      this.state.myDriverId = localStorage.getItem('myDriverId') || null;
+    } catch (e) { console.warn(e); }
+  },
+  saveState() {
+    localStorage.setItem('aguaRutas', JSON.stringify({
+      jobs: this.state.jobs, drivers: this.state.drivers,
+    }));
+    if (this.state.myDriverId) localStorage.setItem('myDriverId', this.state.myDriverId);
+  },
+
+  // ---------- Map ----------
+  initMap() {
+    this.state.map = L.map('map').setView([19.4326, -99.1332], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap', maxZoom: 19,
+    }).addTo(this.state.map);
+  },
+  refreshMarkers() {
+    const m = this.state.map;
+    Object.values(this.state.jobMarkers).forEach(mk => m.removeLayer(mk));
+    Object.values(this.state.driverMarkers).forEach(mk => m.removeLayer(mk));
+    this.state.jobMarkers = {}; this.state.driverMarkers = {};
+    this.state.jobs.filter(j => j.status !== 'completado').forEach(j => {
+      this.state.jobMarkers[j.id] = L.marker([j.lat, j.lng]).addTo(m)
+        .bindPopup(`📍 ${j.clientName || 'Cliente'}<br>${j.status}`);
+    });
+    this.state.drivers.forEach(d => {
+      this.state.driverMarkers[d.id] = L.marker([d.lat, d.lng]).addTo(m)
+        .bindPopup(`${d.name} (${d.status})`);
+    });
+  },
+
+  // ---------- Deep links de WhatsApp ----------
+  async checkLaunchUrl() {
+    try {
+      if (window.Capacitor?.Plugins?.App) {
+        const r = await window.Capacitor.Plugins.App.getLaunchUrl();
+        if (r?.url) this.handleDeepLink(r.url);
+      }
+    } catch (e) { console.warn(e); }
+  },
+  setupDeepLinks() {
+    try {
+      if (window.Capacitor?.Plugins?.App) {
+        window.Capacitor.Plugins.App.addListener('appUrlOpen', (d) => {
+          if (d?.url) this.handleDeepLink(d.url);
+        });
+      }
+    } catch (e) { console.warn(e); }
+  },
+  handleDeepLink(url) {
+    let lat = null, lng = null;
+    let m = url.match(/geo:([-\d.]+),([-\d.]+)/);
+    if (m) { lat = parseFloat(m[1]); lng = parseFloat(m[2]); }
+    if ((lat === 0 && lng === 0) || lat === null) {
+      const q = url.match(/[?&]q=([-\d.]+),([-\d.]+)/);
+      if (q) { lat = parseFloat(q[1]); lng = parseFloat(q[2]); }
+    }
+    if (isNaN(lat) || isNaN(lng)) return;
+    this.addJob(lat, lng, 'Ubicación WhatsApp');
+    this.showToast('📍 Ubicación recibida desde WhatsApp');
+  },
+
+  // ---------- Geolocalización ----------
+  async getCoords() {
+    try {
+      if (window.Capacitor?.Plugins?.Geolocation) {
+        const perm = await window.Capacitor.Plugins.Geolocation.checkPermissions();
+        if (perm.location !== 'granted') {
+          await window.Capacitor.Plugins.Geolocation.requestPermissions();
+        }
+        const p = await window.Capacitor.Plugins.Geolocation.getCurrentPosition({
+          enableHighAccuracy: true, timeout: 15000,
+        });
+        return { lat: p.coords.latitude, lng: p.coords.longitude };
+      }
+      return new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(
+          p => res({ lat: p.coords.latitude, lng: p.coords.longitude }),
+          rej, { enableHighAccuracy: true, timeout: 15000 }
+        );
+      });
+    } catch (e) {
+      this.showToast('Error ubicación: ' + (e.message || e));
+      return null;
+    }
+  },
+
+  // ---------- Jobs ----------
+  addJob(lat, lng, name) {
+    const job = {
+      id: 'j' + Date.now(), lat, lng,
+      clientName: name || '', status: 'pendiente',
+      driverId: null, createdAt: Date.now(),
+    };
+    this.state.jobs.push(job);
+    this.saveState(); this.render(); this.refreshMarkers();
+    this.state.map.setView([lat, lng], 15);
+    return job;
+  },
+  addFromInput() {
+    const input = document.getElementById('coordsInput');
+    const m = (input.value || '').trim().match(/^([-\d.]+)\s*,\s*([-\d.]+)$/);
+    if (!m) return this.showToast('Formato: lat,lng');
+    this.addJob(parseFloat(m[1]), parseFloat(m[2]), 'Manual');
+    input.value = '';
+  },
+  async addFromMyLocation() {
+    const c = await this.getCoords();
+    if (!c) return;
+    this.addJob(c.lat, c.lng, 'Mi ubicación');
+  },
+  assignJob(jobId) {
+    const job = this.state.jobs.find(j => j.id === jobId);
+    if (!job) return;
+    const disponibles = this.state.drivers.filter(d => d.status === 'disponible');
+    if (disponibles.length === 0) return this.sendJobViaWhatsApp(job, 'Chofer');
+    const names = disponibles.map((d, i) => `${i + 1}. ${d.name}`).join('\n');
+    const sel = prompt(`Enviar a:\n${names}\n\nNúmero (0 = WhatsApp libre):`);
+    if (sel === null) return;
+    const idx = parseInt(sel) - 1;
+    const driver = disponibles[idx];
+    if (!driver) return this.sendJobViaWhatsApp(job, 'Chofer');
+    job.driverId = driver.id;
+    job.status = 'asignado';
+    driver.status = 'ocupado';
+    this.saveState(); this.render(); this.refreshMarkers();
+    this.sendJobViaWhatsApp(job, driver.name);
+  },
+  sendJobViaWhatsApp(job, driverName) {
+    const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${job.lat},${job.lng}`;
+    const text = `🛣️ Nuevo servicio Agua Rutas\n\nPara: ${driverName}\nCliente: ${job.clientName || 'N/D'}\nCoords: ${job.lat.toFixed(6)}, ${job.lng.toFixed(6)}\n\nAbre este enlace para navegar:\n${mapUrl}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    try { window.open(url, '_system'); }
+    catch (e) { window.open(url, '_blank'); }
+  },
+  completeJob(jobId) {
+    const job = this.state.jobs.find(j => j.id === jobId);
+    if (!job) return;
+    job.status = 'completado';
+    if (job.driverId) {
+      const d = this.state.drivers.find(x => x.id === job.driverId);
+      if (d) d.status = 'disponible';
+    }
+    this.saveState(); this.render(); this.refreshMarkers();
+  },
+
+  // ---------- Chofer ----------
+  async saveMyLocation() {
+    const name = (document.getElementById('driverName')?.value || '').trim();
+    if (!name) return this.showToast('Escribe tu nombre primero');
+    const c = await this.getCoords();
+    if (!c) return;
+    if (!this.state.myDriverId) this.state.myDriverId = 'd' + Date.now();
+    let d = this.state.drivers.find(x => x.id === this.state.myDriverId);
+    if (!d) {
+      d = { id: this.state.myDriverId, name, lat: c.lat, lng: c.lng, status: 'disponible' };
+      this.state.drivers.push(d);
+    } else { d.name = name; d.lat = c.lat; d.lng = c.lng; }
+    this.saveState(); this.render(); this.refreshMarkers();
+    this.state.map.setView([c.lat, c.lng], 15);
+    this.showToast('✅ Ubicación actualizada');
+  },
+  toggleMyStatus() {
+    const d = this.state.drivers.find(x => x.id === this.state.myDriverId);
+    if (!d) return this.showToast('Guarda tu ubicación primero');
+    d.status = d.status === 'disponible' ? 'ocupado' : 'disponible';
+    this.saveState(); this.render(); this.refreshMarkers();
+  },
+
+  // ---------- Navegación Google Maps ----------
+  navigateTo(lat, lng) {
+    const intentUrl = `google.navigation:q=${lat},${lng}`;
+    const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    if (window.Capacitor?.Plugins?.App) {
+      try { window.open(intentUrl, '_system'); }
+      catch (e) { window.open(webUrl, '_system'); }
+    } else { window.open(webUrl, '_blank'); }
+  },
+
+  // ---------- UI ----------
+  detectMyDriver() {
+    if (!this.state.myDriverId) return;
+    const d = this.state.drivers.find(x => x.id === this.state.myDriverId);
+    if (d) {
+      this.state.role = 'driver';
+      document.getElementById('roleBtn').textContent = 'Chofer';
+    }
+  },
+  toggleRole() {
+    this.state.role = this.state.role === 'admin' ? 'driver' : 'admin';
+    document.getElementById('roleBtn').textContent = this.state.role === 'admin' ? 'Admin' : 'Chofer';
+    this.render();
+  },
+  render() {
+    document.getElementById('panel').innerHTML =
+      this.state.role === 'admin' ? this.renderAdmin() : this.renderDriver();
+  },
+  renderAdmin() {
+    const pend = this.state.jobs.filter(j => j.status === 'pendiente').slice().reverse();
+    const asign = this.state.jobs.filter(j => j.status === 'asignado').slice().reverse();
+    return `
+      <h3>Panel administrador</h3>
+      <div class="input-row">
+        <input id="coordsInput" placeholder="lat, lng" inputmode="decimal">
+        <button class="btn" onclick="App.addFromInput()">+</button>
+      </div>
+      <button class="btn ghost" onclick="App.addFromMyLocation()">📍 Usar mi ubicación</button>
+      <h4>Pendientes (${pend.length})</h4>
+      ${pend.length === 0 ? '<p class="empty">Sin trabajos pendientes</p>' : pend.map(j => `
+        <div class="card">
+          <h3>📍 ${j.clientName || 'Cliente'}</h3>
+          <p>${j.lat.toFixed(5)}, ${j.lng.toFixed(5)}</p>
+          <p>${new Date(j.createdAt).toLocaleString()}</p>
+          <button class="btn" onclick="App.assignJob('${j.id}')">📲 Enviar a chofer por WhatsApp</button>
+        </div>
+      `).join('')}
+      <h4>En camino (${asign.length})</h4>
+      ${asign.length === 0 ? '<p class="empty">Ninguno</p>' : asign.map(j => `
+        <div class="card">
+          <h3>📍 ${j.clientName || 'Cliente'}</h3>
+          <p>${j.lat.toFixed(5)}, ${j.lng.toFixed(5)}</p>
+        </div>
+      `).join('')}
+      <h4>Choferes (${this.state.drivers.length})</h4>
+      ${this.state.drivers.length === 0 ? '<p class="empty">Sin choferes registrados</p>' : this.state.drivers.map(d => `
+        <div class="card">
+          <h3>${d.name}<span class="badge ${d.status}">${d.status}</span></h3>
+          <p>${d.lat.toFixed(5)}, ${d.lng.toFixed(5)}</p>
+        </div>
+      `).join('')}
+    `;
+  },
+  renderDriver() {
+    const me = this.state.drivers.find(x => x.id === this.state.myDriverId);
+    const mis = this.state.jobs.filter(j => j.driverId === this.state.myDriverId && j.status === 'asignado');
+    return `
+      <h3>Panel chofer</h3>
+      <div class="input-row">
+        <input id="driverName" placeholder="Tu nombre" value="${me?.name || ''}">
+        <button class="btn" onclick="App.saveMyLocation()">Guardar</button>
+      </div>
+      <button class="btn" onclick="App.saveMyLocation()">📡 Actualizar ubicación</button>
+      ${me ? `<button class="btn ${me.status === 'disponible' ? 'danger' : 'success'}" onclick="App.toggleMyStatus()">${me.status === 'disponible' ? 'Marcar ocupado' : 'Marcar disponible'}</button>` : ''}
+      <h4>Mis servicios (${mis.length})</h4>
+      ${mis.length === 0 ? '<p class="empty">Sin servicios asignados</p>' : mis.map(j => `
+        <div class="card">
+          <h3>📍 ${j.clientName || 'Cliente'}</h3>
+          <p>${j.lat.toFixed(5)}, ${j.lng.toFixed(5)}</p>
+          <button class="btn success" onclick="App.navigateTo(${j.lat}, ${j.lng})">🚗 Navegar en Google Maps</button>
+          <button class="btn" onclick="App.completeJob('${j.id}')">✓ Marcar completado</button>
+        </div>
+      `).join('')}
+    `;
+  },
+
+  showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => el.classList.remove('show'), 3000);
+  },
+};
+
+document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>
