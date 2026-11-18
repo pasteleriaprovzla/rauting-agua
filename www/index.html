@@ -3,166 +3,211 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="theme-color" content="#0B5E8A">
+<meta name="theme-color" content="#0A2540">
 <title>Agua Rutas</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --blue-900:#062B45; --blue-800:#0B5E8A; --blue-600:#0A6CB8;
-  --aqua-500:#00B8D9; --aqua-300:#7FDBEE;
-  --mex-green:#006847; --mex-red:#CE1126;
-  --cream:#FAFAF7; --ink:#1A1A1A;
-  --gray-500:#6B6B6B; --gray-300:#D8D8D8; --gray-100:#F2F2F2;
-  --radius:10px;
-  --shadow:0 2px 8px rgba(6,43,69,.08);
-  --shadow-lg:0 8px 24px rgba(6,43,69,.16);
+  --ink:#0A2540; --ink-soft:#425466; --muted:#8792A2;
+  --line:#E3E8EF; --line-soft:#F0F3F8;
+  --bg:#FFFFFF; --bg-soft:#F7F9FC;
+  --accent:#4F6BED; --accent-dark:#3B54CB; --accent-soft:#EEF1FE;
+  --success:#0F9D58; --success-soft:#E8F6EE;
+  --danger:#D93F3F; --danger-soft:#FDECEC;
+  --warn:#C77E00; --warn-soft:#FFF6E5;
+  --radius-sm:8px; --radius:12px; --radius-lg:18px;
+  --shadow-xs:0 1px 2px rgba(10,37,64,.04);
+  --shadow-sm:0 1px 3px rgba(10,37,64,.06),0 1px 2px rgba(10,37,64,.04);
 }
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--cream);color:var(--ink);overflow:hidden}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;background:var(--bg-soft);color:var(--ink);overflow:hidden;font-size:15px;-webkit-font-smoothing:antialiased}
 body{display:flex;flex-direction:column}
 .hidden{display:none!important}
-.icon{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.icon.lg{width:28px;height:28px}
+.icon{width:20px;height:20px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.icon.lg{width:26px;height:26px}
 .icon.sm{width:16px;height:16px}
+.icon.xs{width:14px;height:14px}
 
-/* SPLASH */
-.splash{position:fixed;inset:0;z-index:1000;background:linear-gradient(160deg,#062B45 0%,#0B5E8A 55%,#00B8D9 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:16px;transition:opacity .5s,visibility .5s}
+.splash{position:fixed;inset:0;z-index:1000;background:#0A2540;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:20px;transition:opacity .6s ease,visibility .6s ease}
 .splash.fade{opacity:0;visibility:hidden}
-.splash::before{content:'';position:absolute;top:0;left:0;right:0;height:34px;background:linear-gradient(90deg,var(--mex-green),#fff,var(--mex-red));clip-path:polygon(0 0,100% 0,100% 40%,96% 100%,92% 40%,88% 100%,84% 40%,80% 100%,76% 40%,72% 100%,68% 40%,64% 100%,60% 40%,56% 100%,52% 40%,48% 100%,44% 40%,40% 100%,36% 40%,32% 100%,28% 40%,24% 100%,20% 40%,16% 100%,12% 40%,8% 100%,4% 40%,0 100%);opacity:.85}
-.splash-drop{width:96px;height:96px;animation:dropBounce 1.8s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(0,184,217,.5))}
-@keyframes dropBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-12px) scale(1.05)}}
-.splash-ripple{position:absolute;width:180px;height:180px;border-radius:50%;border:2px solid rgba(255,255,255,.4);animation:ripple 2.4s ease-out infinite}
-.splash-ripple.delay{animation-delay:1.2s}
-@keyframes ripple{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.6);opacity:0}}
-.splash h1{font-size:26px;font-weight:700;letter-spacing:.5px}
-.splash p{font-size:13px;opacity:.85}
-.splash-loader{display:flex;gap:6px;margin-top:8px}
-.splash-loader span{width:8px;height:8px;border-radius:50%;background:#fff;animation:dotPulse 1.2s ease-in-out infinite}
-.splash-loader span:nth-child(2){animation-delay:.2s}
-.splash-loader span:nth-child(3){animation-delay:.4s}
-@keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.splash-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(79,107,237,.35) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;filter:blur(40px)}
+.splash-drop{width:80px;height:80px;position:relative;animation:dropFloat 3s ease-in-out infinite;z-index:1}
+@keyframes dropFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.splash-ripple{position:absolute;width:130px;height:130px;border-radius:50%;border:1px solid rgba(255,255,255,.18);top:50%;left:50%;transform:translate(-50%,-50%);animation:rippleOut 3s ease-out infinite}
+.splash-ripple.delay{animation-delay:1.5s}
+@keyframes rippleOut{0%{transform:translate(-50%,-50%) scale(.7);opacity:1}100%{transform:translate(-50%,-50%) scale(1.8);opacity:0}}
+.splash-title{font-size:22px;font-weight:600;letter-spacing:.3px;z-index:1}
+.splash-sub{font-size:12px;opacity:.5;letter-spacing:2px;text-transform:uppercase;z-index:1}
+.splash-loader{display:flex;gap:6px;margin-top:10px;z-index:1}
+.splash-loader span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.6);animation:dotPulse 1.2s ease-in-out infinite}
+.splash-loader span:nth-child(2){animation-delay:.15s}
+.splash-loader span:nth-child(3){animation-delay:.3s}
+@keyframes dotPulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
 
-/* LOGIN */
-.login{position:fixed;inset:0;z-index:900;background:var(--cream);display:flex;flex-direction:column;padding:24px 20px;overflow-y:auto}
-.login-header{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:20px;margin-bottom:32px}
-.login-header svg{width:56px;height:56px}
-.login-header h1{font-size:22px;color:var(--blue-800);font-weight:700}
-.login-header p{font-size:12px;color:var(--gray-500)}
-.roles{display:flex;flex-direction:column;gap:14px}
-.role-card{background:#fff;border:1px solid var(--gray-300);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
-.role-card:active{transform:scale(.98)}
-.role-icon-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
-.role-icon-wrap.admin{background:linear-gradient(135deg,var(--blue-800),var(--blue-600))}
-.role-icon-wrap.driver{background:linear-gradient(135deg,var(--mex-green),#0E9F6E)}
-.role-text h2{font-size:15px;font-weight:600;margin-bottom:2px}
-.role-text p{font-size:12px;color:var(--gray-500)}
-.role-card .chevron{margin-left:auto;color:var(--gray-500)}
-.login-form{background:var(--cream);display:flex;flex-direction:column;gap:16px;max-width:420px;width:100%;margin:auto}
-.login-form .back-btn{background:none;border:none;color:var(--blue-600);padding:8px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;cursor:pointer;align-self:flex-start}
-.login-form .role-display{display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 0}
-.login-form .role-display h2{font-size:18px;color:var(--blue-800)}
-.login-form .role-display p{font-size:13px;color:var(--gray-500)}
+.login{position:fixed;inset:0;z-index:900;background:var(--bg);display:flex;flex-direction:column;padding:32px 24px;overflow-y:auto}
+.login-header{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:40px;margin-bottom:48px}
+.login-logo{width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:var(--ink);border-radius:16px}
+.login-logo svg{width:32px;height:32px}
+.login-header h1{font-size:24px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
+.login-header p{font-size:14px;color:var(--muted)}
+.roles{display:flex;flex-direction:column;gap:12px;max-width:440px;width:100%;margin:0 auto}
+.role-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s ease;box-shadow:var(--shadow-xs)}
+.role-card:active{transform:scale(.99);background:var(--bg-soft)}
+.role-card:hover{border-color:var(--ink-soft);box-shadow:var(--shadow-sm)}
+.role-icon-wrap{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.role-icon-wrap.admin{background:var(--ink)}
+.role-icon-wrap.driver{background:var(--accent)}
+.role-text{flex:1}
+.role-text h2{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.role-text p{font-size:13px;color:var(--muted)}
+.role-card .chevron{color:var(--muted)}
+
+.login-form{display:flex;flex-direction:column;gap:18px;max-width:440px;width:100%;margin:auto}
+.login-form .back-btn{background:none;border:none;color:var(--ink-soft);padding:8px 0;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;cursor:pointer;align-self:flex-start}
+.login-form .role-display{display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0 16px}
+.login-form .role-display h2{font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+.login-form .role-display p{font-size:13px;color:var(--muted)}
 .password-field{position:relative}
-.password-field input{width:100%;padding:14px 44px 14px 16px;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:15px;background:#fff;transition:border-color .2s}
-.password-field input:focus{outline:none;border-color:var(--blue-600)}
-.password-field .lock-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--gray-500)}
-.login-btn{background:var(--blue-600);color:#fff;border:none;border-radius:var(--radius);padding:15px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s}
-.login-btn:disabled{opacity:.6;cursor:not-allowed}
-.login-error{color:var(--mex-red);font-size:13px;text-align:center;padding:8px;background:rgba(206,17,38,.08);border-radius:6px}
-.login-hint{font-size:11px;color:var(--gray-500);text-align:center;margin-top:12px;padding:10px;background:var(--gray-100);border-radius:6px;line-height:1.5}
+.password-field input{width:100%;padding:14px 44px 14px 16px;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:15px;background:var(--bg);transition:border-color .15s,box-shadow .15s;color:var(--ink)}
+.password-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.password-field input::placeholder{color:var(--muted)}
+.password-field .lock-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.login-btn{background:var(--ink);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;letter-spacing:.2px}
+.login-btn:hover{background:#061A2E}
+.login-btn:active{transform:scale(.995)}
+.remember-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);cursor:pointer;user-select:none}
+.remember-row input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.login-error{color:var(--danger);font-size:13px;text-align:center;padding:10px;background:var(--danger-soft);border-radius:var(--radius-sm)}
+.login-hint{font-size:11px;color:var(--muted);text-align:center;padding:12px;background:var(--bg-soft);border-radius:var(--radius-sm);line-height:1.6}
+.login-hint strong{color:var(--ink-soft);font-weight:600}
+.driver-picker{max-width:440px;width:100%;margin:auto;display:flex;flex-direction:column;gap:12px}
+.driver-picker h2{font-size:20px;font-weight:600;color:var(--ink);text-align:center;letter-spacing:-.2px}
+.driver-picker>p{font-size:13px;color:var(--muted);text-align:center;margin-bottom:12px}
 
-/* APP */
-.app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--cream)}
-.app header{background:linear-gradient(135deg,var(--blue-800),var(--blue-600));color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-.header-left{display:flex;align-items:center;gap:10px}
-.header-left svg{width:26px;height:26px}
-.header-title{display:flex;flex-direction:column;line-height:1.2}
-.header-title h1{font-size:14px;font-weight:600}
-.header-title span{font-size:11px;opacity:.85}
-.icon-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s}
-.icon-btn:hover{background:rgba(255,255,255,.25)}
+.app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg-soft)}
+.app header{background:var(--bg);color:var(--ink);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;border-bottom:1px solid var(--line)}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-logo{width:34px;height:34px;background:var(--ink);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header-logo svg{width:20px;height:20px}
+.header-title{display:flex;flex-direction:column;line-height:1.25}
+.header-title h1{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.2px}
+.header-title span{font-size:12px;color:var(--muted);font-weight:500}
+.icon-btn{background:var(--bg-soft);border:1px solid var(--line);color:var(--ink-soft);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.icon-btn:hover{background:var(--line-soft);color:var(--ink)}
 .app main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 #map{flex:1;min-height:150px}
-#panel{background:#fff;border-top:1px solid var(--gray-300);padding:14px;max-height:55vh;overflow-y:auto;flex-shrink:0}
-.panel-title{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-500);font-weight:600;margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+#panel{background:var(--bg);border-top:1px solid var(--line);padding:18px;max-height:58vh;overflow-y:auto;flex-shrink:0}
+.panel-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
 .panel-title:first-child{margin-top:0}
-.panel-title .count{background:var(--blue-600);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;margin-left:auto;letter-spacing:0}
-.panel-title .refresh-btn{margin-left:auto;background:var(--gray-100);border:none;padding:4px 8px;border-radius:6px;cursor:pointer;color:var(--blue-600);font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px}
-.card{background:var(--cream);border:1px solid var(--gray-300);border-radius:var(--radius);padding:12px;margin-bottom:8px}
-.card-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.card-header svg{color:var(--blue-600)}
-.card h3{font-size:13px;font-weight:600;color:var(--ink)}
-.card p{font-size:12px;color:var(--gray-500);margin-bottom:8px}
-.card .meta{font-size:11px;color:var(--gray-500);display:flex;align-items:center;gap:4px;margin-bottom:8px}
-.btn{border:none;border-radius:8px;padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:opacity .2s,transform .1s;width:100%}
-.btn:active{transform:scale(.98)}
-.btn.primary{background:var(--blue-600);color:#fff}
-.btn.success{background:var(--mex-green);color:#fff}
-.btn.danger{background:var(--mex-red);color:#fff}
-.btn.ghost{background:var(--gray-100);color:var(--blue-800)}
-.btn+.btn{margin-top:6px}
-.input-row{display:flex;gap:6px;margin-bottom:8px}
-.input-row input{flex:1;padding:11px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:13px;background:#fff}
-.input-row input:focus{outline:none;border-color:var(--blue-600)}
-.input-row .btn{width:auto;padding:11px 14px}
-.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
-.badge.pendiente{background:rgba(10,108,184,.12);color:var(--blue-600)}
-.badge.asignado{background:rgba(255,152,0,.12);color:#E65100}
-.badge.entregado{background:rgba(0,104,71,.12);color:var(--mex-green)}
-.badge.activo{background:rgba(0,104,71,.12);color:var(--mex-green)}
-.badge.inactivo{background:rgba(107,107,107,.12);color:var(--gray-500)}
-.empty{color:var(--gray-500);font-size:12px;font-style:italic;padding:8px 0;text-align:center}
-.error-box{background:rgba(206,17,38,.08);color:var(--mex-red);padding:10px;border-radius:8px;font-size:12px;text-align:center;margin-bottom:8px}
-.loading-box{text-align:center;padding:16px;color:var(--gray-500);font-size:12px}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--gray-300);border-top-color:var(--blue-600);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
+.panel-title .count{background:var(--bg-soft);color:var(--ink-soft);font-size:11px;padding:2px 8px;border-radius:10px;margin-left:auto;letter-spacing:0;font-weight:600;border:1px solid var(--line)}
+.panel-title .refresh-btn{margin-left:auto;background:none;border:1px solid var(--line);padding:5px 10px;border-radius:8px;cursor:pointer;color:var(--ink-soft);font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;transition:all .15s}
+.panel-title .refresh-btn:hover{background:var(--bg-soft);color:var(--ink)}
+
+.card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px;transition:border-color .15s}
+.card:hover{border-color:var(--line)}
+.card-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.card-header svg{color:var(--ink-soft)}
+.card h3{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-.1px}
+.card p{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5}
+.card .meta{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.card .meta svg{opacity:.6}
+.driver-card-active{border-color:var(--accent);background:var(--accent-soft)}
+
+.btn{border:none;border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;width:100%;letter-spacing:.1px}
+.btn:active{transform:scale(.985)}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#061A2E}
+.btn.accent{background:var(--accent);color:#fff}
+.btn.accent:hover{background:var(--accent-dark)}
+.btn.success{background:var(--success);color:#fff}
+.btn.success:hover{background:#0B8449}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.danger:hover{background:#BB3232}
+.btn.ghost{background:var(--bg);color:var(--ink-soft);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--bg-soft);color:var(--ink)}
+.btn+.btn{margin-top:8px}
+
+.input-row{display:flex;gap:8px;margin-bottom:8px}
+.input-row input,.input-row select{flex:1;padding:12px;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--ink)}
+.input-row input:focus,.input-row select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.input-row .btn{width:auto;padding:12px 16px}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border:1px solid transparent}
+.badge.pendiente{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent-soft)}
+.badge.asignado{background:var(--warn-soft);color:var(--warn);border-color:var(--warn-soft)}
+.badge.entregado{background:var(--success-soft);color:var(--success);border-color:var(--success-soft)}
+.badge.activo{background:var(--success-soft);color:var(--success);border-color:var(--success-soft)}
+.badge.inactivo{background:var(--bg-soft);color:var(--muted);border-color:var(--line)}
+.badge.gps{background:var(--bg-soft);color:var(--ink-soft);border-color:var(--line)}
+.badge.track{background:var(--danger-soft);color:var(--danger);border-color:var(--danger-soft);animation:pulse 1.6s ease-in-out infinite}
+.badge.live{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent-soft)}
+.badge.stale{background:var(--bg-soft);color:var(--muted);border-color:var(--line)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+.empty{color:var(--muted);font-size:13px;padding:16px 0;text-align:center;line-height:1.5}
+.error-box{background:var(--danger-soft);color:var(--danger);padding:12px;border-radius:var(--radius-sm);font-size:13px;text-align:center;margin-bottom:10px;line-height:1.5}
+.loading-box{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Modal */
-.modal-backdrop{position:fixed;inset:0;z-index:950;background:rgba(6,43,69,.6);display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:#fff;border-radius:14px;max-width:420px;width:100%;padding:22px;box-shadow:var(--shadow-lg)}
-.modal h2{font-size:17px;margin-bottom:16px;color:var(--blue-800);display:flex;align-items:center;gap:8px}
-.modal label{display:block;font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:10px}
-.modal input{width:100%;padding:12px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:14px}
-.modal input:focus{outline:none;border-color:var(--blue-600)}
-.modal .modal-actions{display:flex;gap:8px;margin-top:18px}
+.modal-backdrop{position:fixed;inset:0;z-index:950;background:rgba(10,37,64,.45);display:flex;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(2px)}
+@media (min-width:600px){.modal-backdrop{align-items:center;padding:20px}}
+.modal{background:var(--bg);border-radius:var(--radius-lg) var(--radius-lg) 0 0;max-width:480px;width:100%;padding:24px;box-shadow:0 -8px 32px rgba(10,37,64,.12);max-height:85vh;overflow-y:auto;animation:slideUp .25s ease}
+@media (min-width:600px){.modal{border-radius:var(--radius-lg)}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.modal-header-icon{width:36px;height:36px;background:var(--accent-soft);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.modal h2{font-size:18px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+.modal label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;margin-top:14px;letter-spacing:.2px}
+.modal input,.modal select{width:100%;padding:12px;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--ink)}
+.modal input:focus,.modal select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.modal .modal-actions{display:flex;gap:8px;margin-top:22px}
 .modal .modal-actions .btn{flex:1;margin-top:0}
+.modal .coords-box{background:var(--bg-soft);padding:12px;border-radius:var(--radius-sm);font-size:12px;color:var(--ink-soft);margin-bottom:4px;text-align:center;font-family:"SF Mono",Monaco,Consolas,monospace;border:1px solid var(--line);letter-spacing:.5px}
 
-/* Toast */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;max-width:85%;text-align:center;box-shadow:var(--shadow-lg)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:#fff;padding:13px 20px;border-radius:12px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:all .3s ease;pointer-events:none;max-width:calc(100% - 48px);text-align:center;box-shadow:0 8px 24px rgba(10,37,64,.2)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{background:var(--mex-green)}
-.toast.error{background:var(--mex-red)}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+
+/* Botón flotante del mapa */
+.map-fab{position:absolute;right:14px;bottom:calc(58vh + 14px);z-index:500;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .15s}
+.map-fab:hover{color:var(--ink);box-shadow:var(--shadow-md)}
+.map-fab svg{width:20px;height:20px}
 </style>
 </head>
 <body>
 
-<!-- SPLASH -->
+<!-- ========== SPLASH ========== -->
 <div id="splash" class="splash">
-  <div style="position:relative;display:flex;align-items:center;justify-content:center">
+  <div class="splash-glow"></div>
+  <div style="position:relative;display:flex;align-items:center;justify-content:center;width:200px;height:200px">
     <div class="splash-ripple"></div>
     <div class="splash-ripple delay"></div>
     <svg class="splash-drop" viewBox="0 0 24 24" fill="none">
-      <defs><linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#7FDBEE"/><stop offset="100%" stop-color="#0B5E8A"/>
-      </linearGradient></defs>
-      <path d="M12 2.5C12 2.5 4.5 10 4.5 15a7.5 7.5 0 0015 0c0-5-7.5-12.5-7.5-12.5z" fill="url(#dropGrad)" stroke="rgba(255,255,255,.7)" stroke-width="1"/>
+      <defs>
+        <linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFFFFF"/>
+          <stop offset="100%" stop-color="#7FDBEE"/>
+        </linearGradient>
+      </defs>
+      <path d="M12 2.5C12 2.5 4.5 10 4.5 15a7.5 7.5 0 0015 0c0-5-7.5-12.5-7.5-12.5z" fill="url(#dropGrad)"/>
     </svg>
   </div>
-  <h1>Agua Rutas</h1>
-  <p>Distribución de agua</p>
+  <div class="splash-title">Agua Rutas</div>
+  <div class="splash-sub">Distribución de agua</div>
   <div class="splash-loader"><span></span><span></span><span></span></div>
 </div>
 
-<!-- LOGIN -->
+<!-- ========== LOGIN ========== -->
 <div id="login" class="login hidden">
   <div id="role-picker">
     <div class="login-header">
-      <svg viewBox="0 0 24 24" fill="none">
-        <defs><linearGradient id="dropGrad2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#00B8D9"/><stop offset="100%" stop-color="#0B5E8A"/>
-        </linearGradient></defs>
-        <path d="M12 2.5C12 2.5 4.5 10 4.5 15a7.5 7.5 0 0015 0c0-5-7.5-12.5-7.5-12.5z" fill="url(#dropGrad2)"/>
-      </svg>
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2.5C12 2.5 4.5 10 4.5 15a7.5 7.5 0 0015 0c0-5-7.5-12.5-7.5-12.5z"/>
+        </svg>
+      </div>
       <h1>Agua Rutas</h1>
       <p>Selecciona tu rol para continuar</p>
     </div>
@@ -171,14 +216,20 @@ body{display:flex;flex-direction:column}
         <div class="role-icon-wrap admin">
           <svg class="icon lg" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <div class="role-text"><h2>Administrador</h2><p>Pedidos, choferes y ubicaciones</p></div>
+        <div class="role-text">
+          <h2>Administrador</h2>
+          <p>Pedidos, choferes y asignaciones</p>
+        </div>
         <svg class="icon chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
       </div>
       <div class="role-card" data-role="driver">
         <div class="role-icon-wrap driver">
           <svg class="icon lg" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
         </div>
-        <div class="role-text"><h2>Chofer</h2><p>Recibir ubicaciones y navegar</p></div>
+        <div class="role-text">
+          <h2>Chofer</h2>
+          <p>Ver asignaciones y navegar</p>
+        </div>
         <svg class="icon chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
       </div>
     </div>
@@ -189,34 +240,46 @@ body{display:flex;flex-direction:column}
       <svg class="icon sm" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>Volver
     </button>
     <div class="role-display">
-      <div class="role-icon-wrap admin" id="login-role-icon">
+      <div class="role-icon-wrap admin" id="login-role-icon" style="width:56px;height:56px;border-radius:16px">
         <svg class="icon lg" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
       <h2 id="login-role-title">Administrador</h2>
       <p>Ingresa tu contraseña para continuar</p>
     </div>
     <div class="password-field">
-      <input type="password" id="password-input" placeholder="Contraseña" autocomplete="off">
+      <input type="password" id="password-input" placeholder="Contraseña" autocomplete="current-password">
       <svg class="icon lock-icon" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     </div>
+    <label class="remember-row">
+      <input type="checkbox" id="remember-check" checked>
+      <span>Mantener sesión iniciada</span>
+    </label>
     <button type="submit" class="login-btn" id="login-btn">Ingresar</button>
     <p class="login-error hidden" id="login-error">Contraseña incorrecta</p>
     <div class="login-hint">
-      Demo MVP · Admin: <strong>Admin#Agua2024</strong> · Chofer: <strong>Chofer#Agua2024</strong>
+      Demo · Admin: <strong>Admin#Agua2024</strong> · Chofer: <strong>Chofer#Agua2024</strong>
     </div>
   </form>
+
+  <div id="driver-picker" class="driver-picker hidden">
+    <button type="button" class="back-btn" id="driver-picker-back" style="background:none;border:none;color:var(--ink-soft);padding:8px 0;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;cursor:pointer;align-self:flex-start;margin-bottom:16px">
+      <svg class="icon sm" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>Volver
+    </button>
+    <h2>¿Quién eres?</h2>
+    <p>Selecciona tu nombre para entrar</p>
+    <div id="driver-picker-list"></div>
+  </div>
 </div>
 
-<!-- APP -->
+<!-- ========== APP ========== -->
 <div id="app" class="app hidden">
   <header>
     <div class="header-left">
-      <svg viewBox="0 0 24 24" fill="none">
-        <defs><linearGradient id="dropGrad3" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#7FDBEE"/><stop offset="100%" stop-color="#00B8D9"/>
-        </linearGradient></defs>
-        <path d="M12 2.5C12 2.5 4.5 10 4.5 15a7.5 7.5 0 0015 0c0-5-7.5-12.5-7.5-12.5z" fill="url(#dropGrad3)"/>
-      </svg>
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2.5C12 2.5 4.5 10 4.5 15a7.5 7.5 0 0015 0c0-5-7.5-12.5-7.5-12.5z"/>
+        </svg>
+      </div>
       <div class="header-title">
         <h1>Agua Rutas</h1>
         <span id="app-role-label">Administrador</span>
@@ -227,37 +290,42 @@ body{display:flex;flex-direction:column}
     </button>
   </header>
   <main>
-    <div id="map"></div>
+    <div style="position:relative;flex:1;display:flex;flex-direction:column">
+      <div id="map"></div>
+      <button class="map-fab" id="center-drivers-btn" title="Centrar en choferes" onclick="App.centerOnDrivers()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+        </svg>
+      </button>
+    </div>
     <div id="panel"></div>
   </main>
 </div>
 
-<!-- Modal genérico -->
 <div id="modal-root"></div>
-
 <div id="toast" class="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ============================================================
-   CONFIGURACIÓN SUPABASE
-   ============================================================ */
 const SUPABASE_URL = 'https://aiipxfssbnpfpefbbnwm.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpaXB4ZnNzYm5wZnBlZmJibndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MDM2MzIsImV4cCI6MjA5NDI3OTYzMn0.CS_e43iE4ClLgqQULrm4mNm3ji71WQZQcdBNfg6lTHg';
 
-const PASSWORDS = {
-  admin:  'Admin#Agua2024',
-  driver: 'Chofer#Agua2024',
-};
+const PASSWORDS = { admin: 'Admin#Agua2024', driver: 'Chofer#Agua2024' };
 
-const SESSION_KEY = 'aguaRutasSession';
-const UBIC_KEY = 'aguaRutasUbicaciones';
+const SESSION_KEY   = 'aguaRutasSession';
+const UBIC_KEY      = 'aguaRutasUbicaciones';
+const DRIVER_ID_KEY = 'aguaRutasDriverId';
+const DRIVER_NAME_KEY = 'aguaRutasDriverName';
+
+const ARRIVAL_RADIUS_METERS = 200;
+const DRIVER_REPORT_INTERVAL_MS = 60000;
+const DRIVER_ACTIVE_THRESHOLD_MS = 10 * 60 * 1000;
 
 const ICONS = {
   pin:     '<svg class="icon sm" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
   nav:     '<svg class="icon sm" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>',
   check:   '<svg class="icon sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
-  send:    '<svg class="icon sm" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>',
   refresh: '<svg class="icon sm" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>',
   driver:  '<svg class="icon sm" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>',
   clock:   '<svg class="icon sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
@@ -266,23 +334,24 @@ const ICONS = {
   phone:   '<svg class="icon sm" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
   trash:   '<svg class="icon sm" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
   plus:    '<svg class="icon sm" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
-  x:       '<svg class="icon sm" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  gps:     '<svg class="icon sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/></svg>',
+  stop:    '<svg class="icon sm" viewBox="0 0 24 24"><rect width="14" height="14" x="5" y="5" rx="2"/></svg>',
 };
 
 const App = {
   state: {
     role: null,
-    pedidos: [],
-    choferes: [],
-    ubicaciones: [],
-    loadingPedidos: false,
-    loadingChoferes: false,
-    errorPedidos: null,
-    errorChoferes: null,
-    map: null,
-    markers: {},
-    selectedRole: null,
-    refreshTimer: null,
+    pedidos: [], choferes: [], asignaciones: [], ubicaciones: [],
+    loadingPedidos: false, loadingChoferes: false, loadingAsignaciones: false,
+    errorPedidos: null, errorChoferes: null, errorAsignaciones: null,
+    driverId: localStorage.getItem(DRIVER_ID_KEY),
+    driverName: localStorage.getItem(DRIVER_NAME_KEY),
+    pendingDriverList: [],
+    map: null, markers: {},
+    selectedRole: null, refreshTimer: null, assignUbicacionIdx: null,
+    assignPedidoId: null,
+    tracking: null,
+    driverLocTimer: null,
   },
 
   async init() {
@@ -296,16 +365,15 @@ const App = {
       document.getElementById('splash').classList.add('fade');
       setTimeout(() => {
         document.getElementById('splash').classList.add('hidden');
-        const session = localStorage.getItem(SESSION_KEY);
+        const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
         if (session) { this.state.role = session; this.startApp(); }
         else { document.getElementById('login').classList.remove('hidden'); }
-      }, 400);
-    }, 2000);
+      }, 500);
+    }, 1800);
   },
 
-  // ===== LOGIN =====
   setupLogin() {
-    document.querySelectorAll('.role-card').forEach(card => {
+    document.querySelectorAll('.role-card[data-role]').forEach(card => {
       card.addEventListener('click', () => this.showPasswordForm(card.dataset.role));
     });
     document.getElementById('back-to-roles').addEventListener('click', () => {
@@ -313,6 +381,10 @@ const App = {
       document.getElementById('role-picker').classList.remove('hidden');
       document.getElementById('password-input').value = '';
       document.getElementById('login-error').classList.add('hidden');
+    });
+    document.getElementById('driver-picker-back').addEventListener('click', () => {
+      document.getElementById('driver-picker').classList.add('hidden');
+      document.getElementById('role-picker').classList.remove('hidden');
     });
     document.getElementById('login-form').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -333,9 +405,17 @@ const App = {
   },
   attemptLogin() {
     const input = document.getElementById('password-input').value;
+    const remember = document.getElementById('remember-check').checked;
     if (input === PASSWORDS[this.state.selectedRole]) {
       this.state.role = this.state.selectedRole;
-      localStorage.setItem(SESSION_KEY, this.state.role);
+      if (remember) localStorage.setItem(SESSION_KEY, this.state.role);
+      else sessionStorage.setItem(SESSION_KEY, this.state.role);
+      if (this.state.role === 'driver' && !this.state.driverId) {
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('password-input').value = '';
+        this.showDriverPicker();
+        return;
+      }
       document.getElementById('login').classList.add('hidden');
       this.startApp();
     } else {
@@ -344,25 +424,71 @@ const App = {
       document.getElementById('password-input').focus();
     }
   },
+  async showDriverPicker() {
+    document.getElementById('driver-picker').classList.remove('hidden');
+    const list = document.getElementById('driver-picker-list');
+    list.innerHTML = '<div class="loading-box"><span class="spinner"></span>Cargando choferes…</div>';
+    try {
+      const data = await this.sbFetch('choferes?select=*&order=nombre.asc');
+      const activos = (Array.isArray(data) ? data : []).filter(c => c.activo !== false);
+      this.state.pendingDriverList = activos;
+      if (activos.length === 0) {
+        list.innerHTML = '<div class="error-box">No hay choferes activos.<br>Pide al administrador que te registre.</div>';
+        return;
+      }
+      list.innerHTML = activos.map(c => `
+        <div class="role-card" onclick="App.selectDriver('${this.escape(String(c.id))}')">
+          <div class="role-icon-wrap driver">${ICONS.driver.replace('icon sm', 'icon lg')}</div>
+          <div class="role-text">
+            <h2>${this.escape(c.nombre || 'Sin nombre')}</h2>
+            <p>${this.escape(c.telefono || 'Sin teléfono')}</p>
+          </div>
+          <svg class="icon chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+      `).join('');
+    } catch (e) {
+      list.innerHTML = `<div class="error-box">Error al cargar: ${this.escape(e.message || e)}</div>`;
+    }
+  },
+  selectDriver(id) {
+    const chofer = this.state.pendingDriverList.find(c => String(c.id) === String(id));
+    if (!chofer) return;
+    this.state.driverId = chofer.id;
+    this.state.driverName = chofer.nombre;
+    localStorage.setItem(DRIVER_ID_KEY, chofer.id);
+    localStorage.setItem(DRIVER_NAME_KEY, chofer.nombre || '');
+    document.getElementById('driver-picker').classList.add('hidden');
+    document.getElementById('login').classList.add('hidden');
+    this.startApp();
+  },
   setupLogout() {
     document.getElementById('logout-btn').addEventListener('click', () => {
       if (!confirm('¿Cerrar sesión?')) return;
+      this.stopTracking();
+      this.stopDriverLocationUpdates();
       localStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(DRIVER_ID_KEY);
+      localStorage.removeItem(DRIVER_NAME_KEY);
       this.state.role = null;
+      this.state.driverId = null;
+      this.state.driverName = null;
       if (this.state.refreshTimer) { clearInterval(this.state.refreshTimer); this.state.refreshTimer = null; }
       document.getElementById('app').classList.add('hidden');
       document.getElementById('login').classList.remove('hidden');
       document.getElementById('role-picker').classList.remove('hidden');
       document.getElementById('login-form').classList.add('hidden');
+      document.getElementById('driver-picker').classList.add('hidden');
       document.getElementById('password-input').value = '';
     });
   },
 
-  // ===== APP =====
   startApp() {
     document.getElementById('app').classList.remove('hidden');
-    document.getElementById('app-role-label').textContent =
-      this.state.role === 'admin' ? 'Administrador' : 'Chofer';
+    const label = this.state.role === 'admin'
+      ? 'Administrador'
+      : `Chofer · ${this.state.driverName || ''}`.trim();
+    document.getElementById('app-role-label').textContent = label;
     if (!this.state.map) this.initMap();
     this.render();
     this.refreshMarkers();
@@ -371,16 +497,24 @@ const App = {
     if (this.state.role === 'admin') {
       this.loadPedidosFromSupabase();
       this.loadChoferesFromSupabase();
+      this.loadAsignacionesFromSupabase();
       this.state.refreshTimer = setInterval(() => {
         this.loadPedidosFromSupabase(true);
         this.loadChoferesFromSupabase(true);
+        this.loadAsignacionesFromSupabase(true);
+      }, 30000);
+    } else {
+      this.loadAsignacionesFromSupabase();
+      this.initDriverLocationUpdates();
+      this.state.refreshTimer = setInterval(() => {
+        this.loadAsignacionesFromSupabase(true);
       }, 30000);
     }
   },
 
   // ===== MAPA =====
   initMap() {
-    this.state.map = L.map('map').setView([19.4326, -19.1332], 11);
+    this.state.map = L.map('map', { zoomControl: false }).setView([19.4326, -99.1332], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap', maxZoom: 19,
     }).addTo(this.state.map);
@@ -390,17 +524,159 @@ const App = {
     const m = this.state.map;
     Object.values(this.state.markers).forEach(mk => m.removeLayer(mk));
     this.state.markers = {};
+
+    // Pines rojos: destinos de WhatsApp
     this.state.ubicaciones.forEach((u, i) => {
-      this.state.markers['u' + i] = L.marker([u.lat, u.lng]).addTo(m)
-        .bindPopup(`Ubicación recibida<br>${new Date(u.timestamp).toLocaleString()}`);
+      const icon = L.divIcon({
+        className: '',
+        html: '<div style="background:#D93F3F;border:2.5px solid #fff;width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(217,63,63,.5)"></div>',
+        iconSize: [24, 24], iconAnchor: [12, 24]
+      });
+      this.state.markers['u' + i] = L.marker([u.lat, u.lng], { icon }).addTo(m)
+        .bindPopup(`<b>Destino WhatsApp</b><br><small>${new Date(u.timestamp).toLocaleString()}</small>`);
     });
+
+    // Pines naranjas: asignaciones GPS
+    this.state.asignaciones.forEach(a => {
+      const coords = this.parseCoords(a);
+      if (!coords) return;
+      const isDone = String(a.estado || '').toLowerCase() === 'entregado';
+      if (isDone) return;
+      const icon = L.divIcon({
+        className: '',
+        html: '<div style="background:#C77E00;border:2.5px solid #fff;width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(199,126,0,.5)"></div>',
+        iconSize: [24, 24], iconAnchor: [12, 24]
+      });
+      this.state.markers['a' + a.id] = L.marker([coords.lat, coords.lng], { icon }).addTo(m)
+        .bindPopup(`<b>Destino asignado</b>`);
+    });
+
+    // Marcadores azules: choferes reales (solo admin los ve)
+    if (this.state.role === 'admin') {
+      this.state.choferes.forEach(c => {
+        if (c.lat == null || c.lng == null) return;
+        const ts = c.ubicacion_actualizada_en ? new Date(c.ubicacion_actualizada_en).getTime() : 0;
+        const isActive = ts && (Date.now() - ts < DRIVER_ACTIVE_THRESHOLD_MS);
+        const color = isActive ? '#4F6BED' : '#8792A2';
+        const ring = isActive ? '0 0 0 4px rgba(79,107,237,.2), 0 2px 8px rgba(79,107,237,.4)' : '0 2px 6px rgba(135,146,162,.4)';
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="background:${color};border:2.5px solid #fff;width:36px;height:36px;border-radius:50%;box-shadow:${ring};display:flex;align-items:center;justify-content:center;color:#fff">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+          </div>`,
+          iconSize: [36, 36], iconAnchor: [18, 18]
+        });
+        const lastSeen = c.ubicacion_actualizada_en ? this.formatRelativeTime(c.ubicacion_actualizada_en) : 'nunca';
+        this.state.markers['c' + c.id] = L.marker([c.lat, c.lng], { icon }).addTo(m)
+          .bindPopup(`<b>${this.escape(c.nombre || 'Chofer')}</b><br><small>${isActive ? 'Activo' : 'Inactivo'} · ${lastSeen}</small>`);
+      });
+    }
+  },
+  centerOnDrivers() {
+    const withLoc = this.state.choferes.filter(c => c.lat != null && c.lng != null);
+    if (withLoc.length === 0) {
+      this.showToast('Aún no hay ubicaciones de choferes', 'error');
+      return;
+    }
+    if (withLoc.length === 1) {
+      this.state.map.setView([withLoc[0].lat, withLoc[0].lng], 15);
+      return;
+    }
+    const bounds = L.latLngBounds(withLoc.map(c => [c.lat, c.lng]));
+    this.state.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
   },
 
-  // ===== SUPABASE REST =====
-  async sbFetch(path, opts = {}) {
-    if (!SUPABASE_URL || SUPABASE_URL.includes('TU-PROYECTO')) {
-      throw new Error('Configura SUPABASE_URL y SUPABASE_ANON_KEY');
+  // ===== REPORTE DE UBICACIÓN DEL CHOFER =====
+  async initDriverLocationUpdates() {
+    if (this.state.role !== 'driver' || !this.state.driverId) return;
+    // Pedir permiso una vez al iniciar
+    try {
+      if (window.Capacitor?.Plugins?.Geolocation) {
+        const status = await window.Capacitor.Plugins.Geolocation.checkPermissions();
+        if (status.location !== 'granted') {
+          await window.Capacitor.Plugins.Geolocation.requestPermissions();
+        }
+      }
+    } catch (e) { console.warn('Permiso ubicación:', e); }
+
+    // Reportar inmediatamente
+    await this.reportMyLocation();
+
+    // Reportar cada 60s
+    if (this.state.driverLocTimer) clearInterval(this.state.driverLocTimer);
+    this.state.driverLocTimer = setInterval(() => this.reportMyLocation(), DRIVER_REPORT_INTERVAL_MS);
+
+    // Reportar al volver a la app
+    if (!this._visibilityHandler) {
+      this._visibilityHandler = () => {
+        if (!document.hidden && this.state.role === 'driver' && this.state.driverId) {
+          this.reportMyLocation();
+        }
+      };
+      document.addEventListener('visibilitychange', this._visibilityHandler);
     }
+  },
+  stopDriverLocationUpdates() {
+    if (this.state.driverLocTimer) {
+      clearInterval(this.state.driverLocTimer);
+      this.state.driverLocTimer = null;
+    }
+  },
+  async reportMyLocation() {
+    if (this.state.role !== 'driver' || !this.state.driverId) return;
+    try {
+      let lat = null, lng = null;
+      if (window.Capacitor?.Plugins?.Geolocation) {
+        const p = await window.Capacitor.Plugins.Geolocation.getCurrentPosition({
+          enableHighAccuracy: false, timeout: 12000, maximumAge: 60000
+        });
+        lat = p.coords.latitude;
+        lng = p.coords.longitude;
+      } else if (navigator.geolocation) {
+        await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            p => { lat = p.coords.latitude; lng = p.coords.longitude; resolve(); },
+            reject,
+            { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
+          );
+        });
+      }
+      if (lat == null || lng == null) return;
+
+      const payload = { lat, lng, ubicacion_actualizada_en: new Date().toISOString() };
+      await this.sbFetch(`choferes?id=eq.${encodeURIComponent(this.state.driverId)}`, {
+        method: 'PATCH',
+        body: payload,
+        prefer: 'return=minimal',
+        parseJson: false,
+      });
+      // Refrescar estado local
+      const idx = this.state.choferes.findIndex(c => String(c.id) === String(this.state.driverId));
+      if (idx !== -1) Object.assign(this.state.choferes[idx], payload);
+    } catch (e) {
+      // Silencioso
+      console.warn('No se pudo reportar ubicación:', e.message || e);
+    }
+  },
+
+  // ===== UTILS =====
+  formatRelativeTime(isoStr) {
+    try {
+      const then = new Date(isoStr).getTime();
+      if (!then) return 'nunca';
+      const diff = Date.now() - then;
+      if (diff < 0) return 'ahora';
+      const min = Math.floor(diff / 60000);
+      if (min < 1) return 'ahora';
+      if (min < 60) return `hace ${min} min`;
+      const hrs = Math.floor(min / 60);
+      if (hrs < 24) return `hace ${hrs} h`;
+      const days = Math.floor(hrs / 24);
+      return `hace ${days} d`;
+    } catch { return 'nunca'; }
+  },
+
+  async sbFetch(path, opts = {}) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
       method: opts.method || 'GET',
       headers: {
@@ -421,7 +697,6 @@ const App = {
     return text ? JSON.parse(text) : null;
   },
 
-  // ===== PEDIDOS =====
   async loadPedidosFromSupabase(silent = false) {
     this.state.loadingPedidos = true;
     this.state.errorPedidos = null;
@@ -431,14 +706,272 @@ const App = {
       this.state.pedidos = Array.isArray(data) ? data : [];
     } catch (e) {
       this.state.errorPedidos = e.message || String(e);
-      if (!silent) this.showToast('Error al cargar pedidos', 'error');
     } finally {
       this.state.loadingPedidos = false;
       if (this.state.role === 'admin') this.render();
     }
   },
 
-  // ===== CHOFERES =====
+  isGpsAssignment(p) {
+    if (Array.isArray(p.items) && p.items.some(i => i && i.tipo === 'gps')) return true;
+    return false;
+  },
+  parseCoords(p) {
+    if (p.ubicacion_chofer) {
+      const m = String(p.ubicacion_chofer).match(/^(-?[\d.]+)\s*,\s*(-?[\d.]+)$/);
+      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+    }
+    if (Array.isArray(p.items)) {
+      const g = p.items.find(i => i && i.tipo === 'gps');
+      if (g && g.lat != null && g.lng != null) return { lat: Number(g.lat), lng: Number(g.lng) };
+    }
+    return null;
+  },
+  async loadAsignacionesFromSupabase(silent = false) {
+    this.state.loadingAsignaciones = true;
+    this.state.errorAsignaciones = null;
+    if (!silent) this.render();
+    try {
+      let data;
+      if (this.state.role === 'admin') {
+        data = await this.sbFetch('pedidos?select=*&order=created_at.desc&limit=200');
+      } else if (this.state.driverId) {
+        data = await this.sbFetch(`pedidos?select=*&chofer_id=eq.${encodeURIComponent(this.state.driverId)}&order=created_at.desc&limit=100`);
+      } else {
+        data = [];
+      }
+      const todas = Array.isArray(data) ? data : [];
+      this.state.asignaciones = todas.filter(p => this.isGpsAssignment(p));
+      this.refreshMarkers();
+    } catch (e) {
+      this.state.errorAsignaciones = e.message || String(e);
+    } finally {
+      this.state.loadingAsignaciones = false;
+      this.render();
+    }
+  },
+  async completarAsignacion(pedidoId) {
+    if (!confirm('¿Marcar esta asignación como completada?')) return;
+    try {
+      await this.sbFetch(`pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
+        method: 'PATCH',
+        body: { estado: 'entregado' },
+        prefer: 'return=minimal',
+        parseJson: false,
+      });
+      const idx = this.state.asignaciones.findIndex(a => String(a.id) === String(pedidoId));
+      if (idx !== -1) this.state.asignaciones[idx].estado = 'entregado';
+      this.stopTracking();
+      this.refreshMarkers();
+      this.render();
+      this.showToast('Asignación completada', 'success');
+    } catch (e) {
+      this.showToast('Error al completar: ' + (e.message || e), 'error');
+    }
+  },
+
+  getBGPlugin() { return window.Capacitor?.Plugins?.BackgroundGeolocation || null; },
+  getLocalNotifPlugin() { return window.Capacitor?.Plugins?.LocalNotifications || null; },
+  async requestNotificationPermission() {
+    const ln = this.getLocalNotifPlugin();
+    if (!ln) return false;
+    try {
+      const status = await ln.checkPermissions();
+      if (status.display === 'granted') return true;
+      const req = await ln.requestPermissions();
+      return req.display === 'granted';
+    } catch (e) { return false; }
+  },
+  async startTracking(pedidoId, lat, lng) {
+    const bg = this.getBGPlugin();
+    if (!bg) { this.showToast('Tracking no disponible (solo en APK)', 'error'); return; }
+    if (this.state.tracking && this.state.tracking.pedidoId === pedidoId) {
+      this.showToast('Ya estás en camino a este destino', 'success');
+      return;
+    }
+    await this.stopTracking();
+    const hasNotif = await this.requestNotificationPermission();
+    if (!hasNotif) this.showToast('Sin permiso de notificaciones, el rastreo puede fallar', 'error');
+    try {
+      const watcherId = await bg.addWatcher(
+        { backgroundMessage: 'En camino al cliente', backgroundTitle: 'Agua Rutas', requestPermissions: true, stale: false, distanceFilter: 25 },
+        (location, error) => {
+          if (error) { return; }
+          if (!location) return;
+          this.onLocationUpdate(location.latitude, location.longitude);
+        }
+      );
+      this.state.tracking = { watcherId, pedidoId, lat, lng };
+      this.showToast('Rastreo activo: te avisaremos al llegar', 'success');
+      this.render();
+    } catch (e) {
+      this.showToast('Error al iniciar rastreo: ' + (e.message || e), 'error');
+    }
+  },
+  async stopTracking() {
+    const bg = this.getBGPlugin();
+    if (!bg || !this.state.tracking) return;
+    try { await bg.removeWatcher({ id: this.state.tracking.watcherId }); } catch (e) { console.warn(e); }
+    this.state.tracking = null;
+    this.render();
+  },
+  haversineMeters(lat1, lng1, lat2, lng2) {
+    const R = 6371000;
+    const toRad = (d) => d * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  },
+  async onLocationUpdate(currentLat, currentLng) {
+    const t = this.state.tracking;
+    if (!t) return;
+    const dist = this.haversineMeters(currentLat, currentLng, t.lat, t.lng);
+    if (dist <= ARRIVAL_RADIUS_METERS) {
+      const pedidoId = t.pedidoId;
+      await this.stopTracking();
+      this.showToast(`¡Llegaste al destino (${Math.round(dist)} m)!`, 'success');
+      try {
+        await this.sbFetch(`pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
+          method: 'PATCH', body: { estado: 'entregado' }, prefer: 'return=minimal', parseJson: false,
+        });
+        const idx = this.state.asignaciones.findIndex(a => String(a.id) === String(pedidoId));
+        if (idx !== -1) this.state.asignaciones[idx].estado = 'entregado';
+        this.refreshMarkers();
+        this.render();
+      } catch (e) { }
+    }
+  },
+
+  openAssignPedidoModal(pedidoId) {
+    const p = this.state.pedidos.find(x => String(x.id) === String(pedidoId));
+    if (!p) return;
+    const activos = this.state.choferes.filter(c => c.activo !== false);
+    if (activos.length === 0) { this.showToast('Primero agrega al menos un chofer', 'error'); return; }
+    this.state.assignPedidoId = pedidoId;
+    const coords = this.parseCoords(p);
+    const ubicacionTexto = coords
+      ? `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`
+      : (p.direccion || 'Sin dirección registrada');
+    document.getElementById('modal-root').innerHTML = `
+      <div class="modal-backdrop" id="assign-backdrop">
+        <div class="modal" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <div class="modal-header-icon">${ICONS.driver.replace('icon sm','icon')}</div>
+            <h2>Asignar pedido a chofer</h2>
+          </div>
+          <div class="coords-box">${this.escape(ubicacionTexto)}</div>
+          <label for="assign-driver">Selecciona un chofer</label>
+          <select id="assign-driver">
+            ${activos.map(c => `<option value="${this.escape(String(c.id))}">${this.escape(c.nombre)} — ${this.escape(c.telefono || '')}</option>`).join('')}
+          </select>
+          <div class="modal-actions">
+            <button class="btn ghost" onclick="App.closeAssignModal()">Cancelar</button>
+            <button class="btn primary" id="assign-save" onclick="App.confirmAssignPedido()">Asignar</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('assign-backdrop').addEventListener('click', () => this.closeAssignModal());
+  },
+  async confirmAssignPedido() {
+    const pedidoId = this.state.assignPedidoId;
+    if (!pedidoId) return this.closeAssignModal();
+    const pedido = this.state.pedidos.find(x => String(x.id) === String(pedidoId));
+    if (!pedido) return this.closeAssignModal();
+    const sel = document.getElementById('assign-driver');
+    const driverId = sel.value;
+    const driverName = sel.options[sel.selectedIndex].textContent;
+    if (!driverId) return this.showToast('Selecciona un chofer', 'error');
+    const btn = document.getElementById('assign-save');
+    btn.disabled = true;
+    btn.textContent = 'Asignando…';
+    try {
+      const coords = this.parseCoords(pedido);
+      const patch = {
+        chofer_id: driverId,
+        items: [{ tipo: 'gps', lat: coords ? coords.lat : null, lng: coords ? coords.lng : null, direccion: pedido.direccion || null, pedido_original_id: String(pedido.id) }],
+        ubicacion_chofer: coords ? `${coords.lat},${coords.lng}` : null,
+      };
+      await this.sbFetch(`pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
+        method: 'PATCH', body: patch, prefer: 'return=minimal', parseJson: false,
+      });
+      this.closeAssignModal();
+      await this.loadPedidosFromSupabase(true);
+      await this.loadAsignacionesFromSupabase(true);
+      this.showToast('Asignado a ' + driverName.split('—')[0].trim(), 'success');
+    } catch (e) {
+      this.showToast('Error al asignar: ' + (e.message || e), 'error');
+      btn.disabled = false; btn.textContent = 'Asignar';
+    }
+  },
+
+  openAssignModal(ubicacionIdx) {
+    const u = this.state.ubicaciones[ubicacionIdx];
+    if (!u) return;
+    const activos = this.state.choferes.filter(c => c.activo !== false);
+    if (activos.length === 0) { this.showToast('Primero agrega al menos un chofer', 'error'); return; }
+    this.state.assignUbicacionIdx = ubicacionIdx;
+    document.getElementById('modal-root').innerHTML = `
+      <div class="modal-backdrop" id="assign-backdrop">
+        <div class="modal" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <div class="modal-header-icon">${ICONS.gps.replace('icon sm','icon')}</div>
+            <h2>Asignar a chofer</h2>
+          </div>
+          <div class="coords-box">${u.lat.toFixed(6)}, ${u.lng.toFixed(6)}</div>
+          <label for="assign-driver">Selecciona un chofer</label>
+          <select id="assign-driver">
+            ${activos.map(c => `<option value="${this.escape(String(c.id))}">${this.escape(c.nombre)} — ${this.escape(c.telefono || '')}</option>`).join('')}
+          </select>
+          <div class="modal-actions">
+            <button class="btn ghost" onclick="App.closeAssignModal()">Cancelar</button>
+            <button class="btn primary" id="assign-save" onclick="App.confirmAssign()">Asignar</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('assign-backdrop').addEventListener('click', () => this.closeAssignModal());
+  },
+  closeAssignModal() {
+    document.getElementById('modal-root').innerHTML = '';
+    this.state.assignUbicacionIdx = null;
+    this.state.assignPedidoId = null;
+  },
+  async confirmAssign() {
+    const idx = this.state.assignUbicacionIdx;
+    const u = this.state.ubicaciones[idx];
+    if (!u) return this.closeAssignModal();
+    const sel = document.getElementById('assign-driver');
+    const driverId = sel.value;
+    const driverName = sel.options[sel.selectedIndex].textContent;
+    if (!driverId) return this.showToast('Selecciona un chofer', 'error');
+    const btn = document.getElementById('assign-save');
+    btn.disabled = true;
+    btn.textContent = 'Asignando…';
+    try {
+      const payload = {
+        id: 'gps-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        chofer_id: driverId,
+        ubicacion_chofer: `${u.lat},${u.lng}`,
+        direccion: `Ubicación GPS ${u.lat.toFixed(5)}, ${u.lng.toFixed(5)}`,
+        items: [{ tipo: 'gps', lat: u.lat, lng: u.lng }],
+        monto_total: 0,
+      };
+      await this.sbFetch('pedidos', { method: 'POST', body: payload, prefer: 'return=representation' });
+      this.state.ubicaciones.splice(idx, 1);
+      this.saveUbicaciones();
+      this.refreshMarkers();
+      this.closeAssignModal();
+      await this.loadAsignacionesFromSupabase();
+      this.render();
+      this.showToast('Asignado a ' + driverName.split('—')[0].trim(), 'success');
+    } catch (e) {
+      this.showToast('Error al asignar: ' + (e.message || e), 'error');
+      btn.disabled = false; btn.textContent = 'Asignar';
+    }
+  },
+
   async loadChoferesFromSupabase(silent = false) {
     this.state.loadingChoferes = true;
     this.state.errorChoferes = null;
@@ -446,9 +979,9 @@ const App = {
     try {
       const data = await this.sbFetch('choferes?select=*&order=created_at.desc');
       this.state.choferes = Array.isArray(data) ? data : [];
+      this.refreshMarkers();
     } catch (e) {
       this.state.errorChoferes = e.message || String(e);
-      if (!silent) this.showToast('Error al cargar choferes', 'error');
     } finally {
       this.state.loadingChoferes = false;
       if (this.state.role === 'admin') this.render();
@@ -456,21 +989,16 @@ const App = {
   },
   async createChofer(nombre, telefono) {
     const data = await this.sbFetch('choferes', {
-      method: 'POST',
-      body: { nombre, telefono, activo: true },
-      prefer: 'return=representation',
+      method: 'POST', body: { nombre, telefono, activo: true }, prefer: 'return=representation',
     });
     return Array.isArray(data) ? data[0] : data;
   },
   async deleteChofer(id) {
     await this.sbFetch(`choferes?id=eq.${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      prefer: 'return=minimal',
-      parseJson: false,
+      method: 'DELETE', prefer: 'return=minimal', parseJson: false,
     });
   },
 
-  // ===== UBICACIONES WHATSAPP =====
   loadUbicaciones() {
     try {
       const raw = localStorage.getItem(UBIC_KEY);
@@ -490,14 +1018,13 @@ const App = {
     if (this.state.role) this.render();
   },
 
-  // ===== DEEP LINKS =====
   async checkLaunchUrl() {
     try {
       if (window.Capacitor?.Plugins?.App) {
         const r = await window.Capacitor.Plugins.App.getLaunchUrl();
         if (r?.url) this.handleDeepLink(r.url);
       }
-    } catch (e) { console.warn(e); }
+    } catch (e) { }
   },
   setupDeepLinks() {
     try {
@@ -506,7 +1033,7 @@ const App = {
           if (d?.url) this.handleDeepLink(d.url);
         });
       }
-    } catch (e) { console.warn(e); }
+    } catch (e) { }
   },
   handleDeepLink(url) {
     let lat = null, lng = null;
@@ -520,61 +1047,29 @@ const App = {
     this.addUbicacion(lat, lng);
   },
 
-  // ===== WHATSAPP / NAVEGACIÓN =====
-  openWhatsApp(text) {
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    try { window.open(url, '_system'); } catch { window.open(url, '_blank'); }
-  },
-  sendPedido(pedidoId) {
-    const p = this.state.pedidos.find(x => x.id === pedidoId);
-    if (!p) return;
-    const direccion = p.direccion || 'Sin dirección registrada';
-    const monto = p.monto_total != null ? `$${Number(p.monto_total).toFixed(2)}` : '—';
-    const mapsSearch = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
-    const texto =
-`🚚 Nuevo pedido Agua Rutas
-
-Pedido: #${String(p.id).slice(-6)}
-Monto: ${monto}
-Dirección: ${direccion}
-
-Abrir en Google Maps:
-${mapsSearch}`;
-    this.openWhatsApp(texto);
-  },
-  sendUbicacion(idx) {
-    const u = this.state.ubicaciones[idx];
-    if (!u) return;
-    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${u.lat},${u.lng}`;
-    const geoUrl = `geo:${u.lat},${u.lng}`;
-    const texto =
-`📍 Nueva ubicación de entrega
-
-Coordenadas: ${u.lat.toFixed(6)}, ${u.lng.toFixed(6)}
-Recibida: ${new Date(u.timestamp).toLocaleString()}
-
-Navegar con Google Maps:
-${mapsUrl}
-
-Abrir en Agua Rutas (mapa interno):
-${geoUrl}`;
-    this.openWhatsApp(texto);
-  },
-  navigateTo(lat, lng) {
+  navigateTo(pedidoId, lat, lng) {
+    if (pedidoId && !String(pedidoId).startsWith('u') && lat != null && lng != null) {
+      this.startTracking(String(pedidoId), lat, lng);
+    }
     const intentUrl = `google.navigation:q=${lat},${lng}`;
     const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
     if (window.Capacitor?.Plugins?.App) {
-      try { window.open(intentUrl, '_system'); }
-      catch { window.open(webUrl, '_system'); }
+      try { window.open(intentUrl, '_system'); } catch { window.open(webUrl, '_system'); }
     } else { window.open(webUrl, '_blank'); }
   },
+  navigateByAddress(direccion) {
+    const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
+    window.open(webUrl, '_blank');
+  },
 
-  // ===== MODAL NUEVO CHOFER =====
   openNuevoChoferModal() {
     document.getElementById('modal-root').innerHTML = `
       <div class="modal-backdrop" id="nuevo-chofer-backdrop">
         <div class="modal" onclick="event.stopPropagation()">
-          <h2>${ICONS.driver} Nuevo chofer</h2>
+          <div class="modal-header">
+            <div class="modal-header-icon">${ICONS.driver.replace('icon sm','icon')}</div>
+            <h2>Nuevo chofer</h2>
+          </div>
           <label for="nc-nombre">Nombre completo</label>
           <input id="nc-nombre" placeholder="Ej. Juan Pérez" maxlength="80" autocomplete="off">
           <label for="nc-telefono">Teléfono</label>
@@ -589,17 +1084,14 @@ ${geoUrl}`;
     document.getElementById('nuevo-chofer-backdrop').addEventListener('click', () => this.closeNuevoChoferModal());
     setTimeout(() => document.getElementById('nc-nombre').focus(), 100);
   },
-  closeNuevoChoferModal() {
-    document.getElementById('modal-root').innerHTML = '';
-  },
+  closeNuevoChoferModal() { document.getElementById('modal-root').innerHTML = ''; },
   async submitNuevoChofer() {
     const nombre = (document.getElementById('nc-nombre').value || '').trim();
     const telefono = (document.getElementById('nc-telefono').value || '').trim();
     if (!nombre) return this.showToast('El nombre es obligatorio', 'error');
     if (!telefono) return this.showToast('El teléfono es obligatorio', 'error');
     const btn = document.getElementById('nc-save');
-    btn.disabled = true;
-    btn.textContent = 'Guardando…';
+    btn.disabled = true; btn.textContent = 'Guardando…';
     try {
       const nuevo = await this.createChofer(nombre, telefono);
       this.state.choferes.unshift(nuevo);
@@ -608,17 +1100,17 @@ ${geoUrl}`;
       this.showToast('Chofer agregado', 'success');
     } catch (e) {
       this.showToast('Error al guardar: ' + (e.message || e), 'error');
-      btn.disabled = false;
-      btn.textContent = 'Guardar';
+      btn.disabled = false; btn.textContent = 'Guardar';
     }
   },
   async confirmDeleteChofer(id) {
-    const chofer = this.state.choferes.find(c => c.id === id);
+    const chofer = this.state.choferes.find(c => String(c.id) === String(id));
     if (!chofer) return;
     if (!confirm(`¿Eliminar al chofer "${chofer.nombre}"? Esta acción no se puede deshacer.`)) return;
     try {
       await this.deleteChofer(id);
-      this.state.choferes = this.state.choferes.filter(c => c.id !== id);
+      this.state.choferes = this.state.choferes.filter(c => String(c.id) !== String(id));
+      this.refreshMarkers();
       this.render();
       this.showToast('Chofer eliminado', 'success');
     } catch (e) {
@@ -626,7 +1118,6 @@ ${geoUrl}`;
     }
   },
 
-  // ===== RENDER =====
   render() {
     const panel = document.getElementById('panel');
     panel.innerHTML = this.state.role === 'admin' ? this.renderAdmin() : this.renderDriver();
@@ -640,6 +1131,7 @@ ${geoUrl}`;
       return `<div class="loading-box"><span class="spinner"></span>Cargando pedidos…</div>`;
     }
     const activos = this.state.pedidos.filter(p => {
+      if (this.isGpsAssignment(p)) return false;
       const est = String(p.estado || '').toLowerCase();
       return est !== 'entregado' && est !== 'completado' && est !== 'cancelado';
     });
@@ -659,8 +1151,8 @@ ${geoUrl}`;
           <div class="meta">${ICONS.pin} ${this.escape(dir)}</div>
           ${monto ? `<div class="meta">${ICONS.money} ${monto}</div>` : ''}
           ${fecha ? `<div class="meta">${ICONS.clock} ${this.escape(fecha)}</div>` : ''}
-          <button class="btn primary" onclick="App.sendPedido('${this.escape(String(p.id))}')">
-            ${ICONS.send} Enviar por WhatsApp
+          <button class="btn primary" onclick="App.openAssignPedidoModal('${this.escape(String(p.id))}')">
+            ${ICONS.driver} Asignar a chofer
           </button>
         </div>
       `;
@@ -675,19 +1167,37 @@ ${geoUrl}`;
       return `<div class="loading-box"><span class="spinner"></span>Cargando choferes…</div>`;
     }
     if (this.state.choferes.length === 0) {
-      return `<p class="empty">Sin choferes registrados. Toca "+ Agregar" para crear el primero.</p>`;
+      return `<p class="empty">Sin choferes registrados</p>`;
     }
-    return this.state.choferes.map(c => {
+    const recientes = this.state.choferes.filter(c => {
+      if (!c.ubicacion_actualizada_en) return false;
+      return (Date.now() - new Date(c.ubicacion_actualizada_en).getTime()) < DRIVER_ACTIVE_THRESHOLD_MS;
+    });
+    const header = `<p style="font-size:12px;color:var(--muted);margin-bottom:10px">
+      ${recientes.length} activo${recientes.length === 1 ? '' : 's'} de ${this.state.choferes.length} ·
+      Los activos se actualizaron en los últimos 10 min
+    </p>`;
+    return header + this.state.choferes.map(c => {
       const activo = c.activo !== false;
+      const hasLoc = c.lat != null && c.lng != null;
+      const ts = c.ubicacion_actualizada_en ? new Date(c.ubicacion_actualizada_en).getTime() : 0;
+      const isRecent = ts && (Date.now() - ts < DRIVER_ACTIVE_THRESHOLD_MS);
+      const lastSeen = hasLoc ? this.formatRelativeTime(c.ubicacion_actualizada_en) : 'Sin ubicación';
+      const cardClass = isRecent ? 'card driver-card-active' : 'card';
       return `
-        <div class="card">
+        <div class="${cardClass}">
           <div class="card-header">
             ${ICONS.driver}
             <h3>${this.escape(c.nombre || 'Sin nombre')}</h3>
-            <span class="badge ${activo ? 'activo' : 'inactivo'}" style="margin-left:auto">${activo ? 'activo' : 'inactivo'}</span>
+            <span class="badge ${isRecent ? 'live' : (hasLoc ? 'stale' : 'inactivo')}" style="margin-left:auto">
+              ${isRecent ? 'En vivo' : (hasLoc ? 'Inactivo' : 'Sin GPS')}
+            </span>
           </div>
           <div class="meta">${ICONS.phone} ${this.escape(c.telefono || '—')}</div>
-          <button class="btn danger" onclick="App.confirmDeleteChofer('${this.escape(String(c.id))}')">
+          ${hasLoc ? `<div class="meta">${ICONS.pin} ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}</div>` : ''}
+          <div class="meta">${ICONS.clock} ${lastSeen}</div>
+          ${hasLoc ? `<button class="btn ghost" onclick="App.state.map.setView([${c.lat}, ${c.lng}], 16)">${ICONS.nav} Ver en mapa</button>` : ''}
+          <button class="btn ghost" onclick="App.confirmDeleteChofer('${this.escape(String(c.id))}')">
             ${ICONS.trash} Eliminar
           </button>
         </div>
@@ -709,8 +1219,49 @@ ${geoUrl}`;
           </div>
           <div class="meta">${ICONS.clock} ${new Date(u.timestamp).toLocaleString()}</div>
           ${this.state.role === 'admin'
-            ? `<button class="btn success" onclick="App.sendUbicacion(${realIdx})">${ICONS.send} Enviar a chofer</button>`
-            : `<button class="btn success" onclick="App.navigateTo(${u.lat}, ${u.lng})">${ICONS.nav} Navegar en Google Maps</button>`}
+            ? `<button class="btn accent" onclick="App.openAssignModal(${realIdx})">${ICONS.driver} Asignar a chofer</button>`
+            : `<button class="btn accent" onclick="App.navigateTo('u${realIdx}', ${u.lat}, ${u.lng})">${ICONS.nav} Navegar en Google Maps</button>`}
+        </div>
+      `;
+    }).join('');
+  },
+
+  renderAsignacionesList(forAdmin = true) {
+    if (this.state.errorAsignaciones) {
+      return `<div class="error-box">No se pudieron cargar asignaciones.<br><small>${this.escape(this.state.errorAsignaciones)}</small></div>`;
+    }
+    if (this.state.loadingAsignaciones && this.state.asignaciones.length === 0) {
+      return `<div class="loading-box"><span class="spinner"></span>Cargando…</div>`;
+    }
+    const activas = this.state.asignaciones.filter(a => {
+      const est = String(a.estado || '').toLowerCase();
+      return est !== 'entregado' && est !== 'completado' && est !== 'cancelado';
+    });
+    if (activas.length === 0) return `<p class="empty">Sin asignaciones pendientes</p>`;
+    return activas.map(a => {
+      const coords = this.parseCoords(a);
+      const chofer = this.state.choferes.find(c => String(c.id) === String(a.chofer_id));
+      const nombreChofer = chofer ? chofer.nombre : (a.chofer_id ? 'Chofer' : 'Sin asignar');
+      const fecha = a.created_at ? new Date(a.created_at).toLocaleString() : '';
+      const isTracking = this.state.tracking && this.state.tracking.pedidoId === String(a.id);
+      const coordsText = coords ? `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}` : (a.direccion || 'Sin ubicación');
+      const navBtn = coords
+        ? `<button class="btn accent" onclick="App.navigateTo('${this.escape(String(a.id))}', ${coords.lat}, ${coords.lng})">${ICONS.nav} Navegar en Google Maps</button>`
+        : `<button class="btn accent" onclick="App.navigateByAddress('${this.escape(a.direccion || '')}')">${ICONS.nav} Buscar dirección en Google Maps</button>`;
+      return `
+        <div class="card">
+          <div class="card-header">
+            ${ICONS.gps}
+            <h3>${this.escape(coordsText)}</h3>
+            <span class="badge ${isTracking ? 'track' : 'gps'}" style="margin-left:auto">${isTracking ? 'En camino' : 'GPS'}</span>
+          </div>
+          ${fecha ? `<div class="meta">${ICONS.clock} ${this.escape(fecha)}</div>` : ''}
+          ${forAdmin ? `<div class="meta">${ICONS.driver} ${this.escape(nombreChofer)}</div>` : ''}
+          ${navBtn}
+          ${isTracking ? `<button class="btn ghost" onclick="App.stopTracking()">${ICONS.stop} Detener rastreo</button>` : ''}
+          ${!forAdmin ? `<button class="btn success" onclick="App.completarAsignacion('${this.escape(String(a.id))}')">
+            ${ICONS.check} Marcar completada
+          </button>` : ''}
         </div>
       `;
     }).join('');
@@ -718,49 +1269,58 @@ ${geoUrl}`;
 
   renderAdmin() {
     const activos = this.state.pedidos.filter(p => {
+      if (this.isGpsAssignment(p)) return false;
       const est = String(p.estado || '').toLowerCase();
       return est !== 'entregado' && est !== 'completado' && est !== 'cancelado';
     });
     return `
       <div class="panel-title">
-        ${ICONS.bag} Pedidos pendientes
-        <span class="count">${activos.length}</span>
-        <button class="refresh-btn" onclick="App.loadPedidosFromSupabase()">
-          ${ICONS.refresh} Actualizar
-        </button>
-      </div>
-      ${this.renderPedidosList()}
-
-      <div class="panel-title">
         ${ICONS.driver} Choferes
         <span class="count">${this.state.choferes.length}</span>
-        <button class="refresh-btn" onclick="App.loadChoferesFromSupabase()">
-          ${ICONS.refresh} Actualizar
-        </button>
+        <button class="refresh-btn" onclick="App.loadChoferesFromSupabase()">${ICONS.refresh} Actualizar</button>
       </div>
-      <button class="btn primary" onclick="App.openNuevoChoferModal()">
-        ${ICONS.plus} Agregar chofer
-      </button>
-      <div style="height:8px"></div>
+      <button class="btn primary" onclick="App.openNuevoChoferModal()">${ICONS.plus} Agregar chofer</button>
+      <div style="height:10px"></div>
       ${this.renderChoferesList()}
+
+      <div class="panel-title">
+        ${ICONS.bag} Pedidos pendientes
+        <span class="count">${activos.length}</span>
+        <button class="refresh-btn" onclick="App.loadPedidosFromSupabase()">${ICONS.refresh} Actualizar</button>
+      </div>
+      ${this.renderPedidosList()}
 
       <div class="panel-title">
         ${ICONS.pin} Ubicaciones de WhatsApp
         <span class="count">${this.state.ubicaciones.length}</span>
       </div>
       ${this.renderUbicacionesList()}
+
+      <div class="panel-title">
+        ${ICONS.gps} Asignaciones a choferes
+        <span class="count">${this.state.asignaciones.length}</span>
+        <button class="refresh-btn" onclick="App.loadAsignacionesFromSupabase()">${ICONS.refresh} Actualizar</button>
+      </div>
+      ${this.renderAsignacionesList(true)}
     `;
   },
 
   renderDriver() {
     return `
       <div class="panel-title">
-        ${ICONS.pin} Ubicaciones recibidas
+        ${ICONS.gps} Mis asignaciones
+        <span class="count">${this.state.asignaciones.length}</span>
+        <button class="refresh-btn" onclick="App.loadAsignacionesFromSupabase()">${ICONS.refresh} Actualizar</button>
+      </div>
+      <p class="empty" style="text-align:left;padding:0 0 10px">
+        Al tocar "Navegar" se activa el rastreo. Cuando estés a ${ARRIVAL_RADIUS_METERS} m del destino, el pedido se marcará como entregado automáticamente.
+      </p>
+      ${this.renderAsignacionesList(false)}
+
+      <div class="panel-title" style="margin-top:20px">
+        ${ICONS.pin} Ubicaciones de WhatsApp (local)
         <span class="count">${this.state.ubicaciones.length}</span>
       </div>
-      <p class="empty" style="text-align:left;padding:0 0 8px">
-        Toca una ubicación para navegar con Google Maps.
-      </p>
       ${this.renderUbicacionesList()}
     `;
   },
