@@ -1,7 +1,4 @@
-// Parchea AndroidManifest.xml para:
-//  - Recibir ubicaciones de WhatsApp (geo:)
-//  - Recibir enlaces de Google Maps (https://maps.google.com, maps.app.goo.gl, etc.)
-//  - Permisos de ubicación, notificaciones y foreground service
+// Parchea AndroidManifest.xml para recibir enlaces de mapas y contenido compartido
 const fs = require('fs');
 const path = require('path');
 
@@ -35,50 +32,65 @@ if (!tagContent.includes('launchMode')) {
   console.log('✅ launchMode="singleTask" agregado');
 }
 
-// --- 2. Intent filters: geo: + Google Maps ---
-if (!manifest.includes('android:scheme="geo"')) {
-  const intentFilters = `
+// --- 2. Intent filters ---
+const needGeo = !manifest.includes('android:scheme="geo"');
+const needWwwMaps = !manifest.includes('android:host="www.google.com"');
+const needMapsGoogle = !manifest.includes('android:host="maps.google.com"');
+const needSendText = !manifest.includes('android:mimeType="text/plain"'); // Nuevo filtro
+
+if (needGeo || needWwwMaps || needMapsGoogle || needSendText) {
+  let intentFilters = '';
+
+  if (needGeo) {
+    intentFilters += `
             <!-- Recibir ubicaciones nativas de WhatsApp -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="geo" />
-            </intent-filter>
+            </intent-filter>`;
+    console.log('✅ Filtro geo: agregado');
+  }
 
-            <!-- Recibir enlaces de Google Maps (www.google.com/maps) -->
+  if (needWwwMaps) {
+    intentFilters += `
+            <!-- Google Maps: www.google.com/maps (Abrir enlace) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="www.google.com" android:pathPrefix="/maps" />
                 <data android:scheme="http"  android:host="www.google.com" android:pathPrefix="/maps" />
-            </intent-filter>
+            </intent-filter>`;
+    console.log('✅ Filtro www.google.com/maps agregado');
+  }
 
-            <!-- Recibir enlaces de Google Maps (maps.google.com) -->
+  if (needMapsGoogle) {
+    intentFilters += `
+            <!-- Google Maps: maps.google.com (Abrir enlace) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="maps.google.com" />
                 <data android:scheme="http"  android:host="maps.google.com" />
-            </intent-filter>
-
-            <!-- Recibir enlaces cortos: maps.app.goo.gl (REQUIERE autoVerify) -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="maps.app.goo.gl" android:pathPrefix="/" />
-            </intent-filter>
-
-            <!-- Recibir enlaces cortos viejos: goo.gl/maps -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="goo.gl" android:pathPrefix="/maps" />
             </intent-filter>`;
+    console.log('✅ Filtro maps.google.com agregado');
+  }
+
+  if (needSendText) {
+    intentFilters += `
+            <!-- Recibir texto compartido (Google Maps, WhatsApp, etc.) -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="text/*" />
+            </intent-filter>`;
+    console.log('✅ Filtro ACTION_SEND (texto compartido) agregado');
+  }
+
   const idxEnd = manifest.indexOf('</activity>', nameIdx);
   if (idxEnd === -1) {
     console.error('❌ No se pudo insertar intent-filters');
@@ -87,7 +99,6 @@ if (!manifest.includes('android:scheme="geo"')) {
   manifest =
     manifest.substring(0, idxEnd) + intentFilters + '\n        ' + manifest.substring(idxEnd);
   changed = true;
-  console.log('✅ Intent-filters (geo + Google Maps + App Links) agregados');
 }
 
 // --- 3. Permisos ---
@@ -110,13 +121,6 @@ for (const perm of perms) {
       );
       changed = true;
       console.log(`✅ Permiso ${perm} agregado`);
-    } else {
-      const manifestOpen = manifest.indexOf('>', manifest.indexOf('<manifest'));
-      manifest = manifest.substring(0, manifestOpen + 1) +
-        `\n    <uses-permission android:name="${perm}" />` +
-        manifest.substring(manifestOpen + 1);
-      changed = true;
-      console.log(`✅ Permiso ${perm} agregado (junto a <manifest>)`);
     }
   }
 }
