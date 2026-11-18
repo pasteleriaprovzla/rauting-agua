@@ -339,6 +339,7 @@ const App = {
     this.setupLogin();
     this.setupLogout();
     this.setupDeepLinks();
+    this.setupShareTarget(); // Escuchar cuando comparten un enlace desde Google Maps
     this.checkLaunchUrl();
 
     setTimeout(() => {
@@ -968,7 +969,7 @@ const App = {
     this.saveUbicaciones();
     this.refreshMarkers();
     this.state.map.setView([lat, lng], 15);
-    this.showToast('Ubicación recibida de WhatsApp', 'success');
+    this.showToast('Ubicación recibida', 'success');
     if (this.state.role) this.render();
   },
 
@@ -990,53 +991,53 @@ const App = {
     } catch (e) { }
   },
 
-  // ===== PARSER DE URLS DE GOOGLE MAPS Y GEO: =====
+  // ===== SHARE TARGET (Recibir enlaces compartidos de Google Maps) =====
+  setupShareTarget() {
+    try {
+      if (window.Capacitor?.Plugins?.ShareTarget) {
+        window.Capacitor.Plugins.ShareTarget.addListener('shareReceived', (data) => {
+          console.log('Contenido compartido recibido:', data);
+          const sharedText = data.text || data.title || '';
+          if (sharedText) {
+            // Extraer la primera URL del texto
+            const urlMatch = sharedText.match(/https?:\/\/[^\s]+/);
+            const urlToParse = urlMatch ? urlMatch[0] : sharedText;
+            this.handleDeepLink(urlToParse);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('ShareTarget no disponible', e);
+    }
+  },
+
   parseMapsUrl(url) {
     if (!url) return null;
     try {
       const decoded = decodeURIComponent(url);
-
-      // 1) geo:LAT,LNG  o  geo:0,0?q=LAT,LNG
       let m = decoded.match(/geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
       if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-
-      // 2) ?q=LAT,LNG  (maps.google.com/?q=…)
       m = decoded.match(/[?&]q=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
       if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-
-      // 3) ?query=LAT,LNG  (maps/search/?api=1&query=…)
       m = decoded.match(/[?&]query=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
       if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-
-      // 4) ?destination=LAT,LNG  (maps/dir/?api=1&destination=…)
       m = decoded.match(/[?&]destination=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
       if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-
-      // 5) /maps/@LAT,LNG,Z  o  /maps/place/LAT,LNG  o  /maps/search/LAT,LNG
       m = decoded.match(/\/maps\/(?:@|place|search)\/?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
       if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-
-      // 6) /maps/place/NAME/@LAT,LNG,Z
       m = decoded.match(/\/maps\/place\/[^/]*\/@\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
       if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-
-      // 7) /maps/place/NAME/LAT,LNG (con o sin @)
       m = decoded.match(/\/maps\/place\/[^/]+\/\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
       if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-
       return null;
     } catch { return null; }
   },
   async resolveShortMapsUrl(url) {
-    // Intenta seguir el redirect de enlaces cortos (maps.app.goo.gl / goo.gl/maps)
-    // para obtener la URL larga con coordenadas.
     try {
       const res = await fetch(url, { method: 'GET', redirect: 'follow' });
-      // res.url es la URL final después de redirects
       if (res.url && res.url !== url) {
         return this.parseMapsUrl(res.url);
       }
-      // A veces el HTML contiene la URL canónica en og:url
       const html = await res.text();
       const ogMatch = html.match(/property=["']og:url["']\s+content=["']([^"']+)["']/i)
                    || html.match(/rel=["']canonical["']\s+href=["']([^"']+)["']/i);
@@ -1046,20 +1047,15 @@ const App = {
       }
       return this.parseMapsUrl(res.url || '');
     } catch (e) {
-      console.warn('No se pudo resolver enlace corto:', e);
       return null;
     }
   },
   async handleDeepLink(url) {
     if (!url) return;
-    // 1) Intento directo
     let coords = this.parseMapsUrl(url);
-
-    // 2) Si no hay coords y es enlace corto, intento resolverlo
     if (!coords && /(maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(url)) {
       coords = await this.resolveShortMapsUrl(url);
     }
-
     if (!coords) {
       this.showToast('No se pudo leer la ubicación del enlace', 'error');
       return;
