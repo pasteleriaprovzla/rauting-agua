@@ -61,7 +61,6 @@ body{display:flex;flex-direction:column}
 .role-text h2{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px}
 .role-text p{font-size:13px;color:var(--muted)}
 .role-card .chevron{color:var(--muted)}
-
 .login-form{display:flex;flex-direction:column;gap:18px;max-width:440px;width:100%;margin:auto}
 .login-form .back-btn{background:none;border:none;color:var(--ink-soft);padding:8px 0;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;cursor:pointer;align-self:flex-start}
 .login-form .role-display{display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0 16px}
@@ -127,11 +126,6 @@ body{display:flex;flex-direction:column}
 .btn.ghost:hover{background:var(--bg-soft);color:var(--ink)}
 .btn+.btn{margin-top:8px}
 
-.input-row{display:flex;gap:8px;margin-bottom:8px}
-.input-row input,.input-row select{flex:1;padding:12px;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--ink)}
-.input-row input:focus,.input-row select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.input-row .btn{width:auto;padding:12px 16px}
-
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border:1px solid transparent}
 .badge.pendiente{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent-soft)}
 .badge.asignado{background:var(--warn-soft);color:var(--warn);border-color:var(--warn-soft)}
@@ -170,7 +164,6 @@ body{display:flex;flex-direction:column}
 .toast.success{background:var(--success)}
 .toast.error{background:var(--danger)}
 
-/* Botón flotante del mapa */
 .map-fab{position:absolute;right:14px;bottom:calc(58vh + 14px);z-index:500;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .15s}
 .map-fab:hover{color:var(--ink);box-shadow:var(--shadow-md)}
 .map-fab svg{width:20px;height:20px}
@@ -178,19 +171,15 @@ body{display:flex;flex-direction:column}
 </head>
 <body>
 
-<!-- ========== SPLASH ========== -->
 <div id="splash" class="splash">
   <div class="splash-glow"></div>
   <div style="position:relative;display:flex;align-items:center;justify-content:center;width:200px;height:200px">
     <div class="splash-ripple"></div>
     <div class="splash-ripple delay"></div>
     <svg class="splash-drop" viewBox="0 0 24 24" fill="none">
-      <defs>
-        <linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF"/>
-          <stop offset="100%" stop-color="#7FDBEE"/>
-        </linearGradient>
-      </defs>
+      <defs><linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#7FDBEE"/>
+      </linearGradient></defs>
       <path d="M12 2.5C12 2.5 4.5 10 4.5 15a7.5 7.5 0 0015 0c0-5-7.5-12.5-7.5-12.5z" fill="url(#dropGrad)"/>
     </svg>
   </div>
@@ -199,7 +188,6 @@ body{display:flex;flex-direction:column}
   <div class="splash-loader"><span></span><span></span><span></span></div>
 </div>
 
-<!-- ========== LOGIN ========== -->
 <div id="login" class="login hidden">
   <div id="role-picker">
     <div class="login-header">
@@ -216,20 +204,14 @@ body{display:flex;flex-direction:column}
         <div class="role-icon-wrap admin">
           <svg class="icon lg" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <div class="role-text">
-          <h2>Administrador</h2>
-          <p>Pedidos, choferes y asignaciones</p>
-        </div>
+        <div class="role-text"><h2>Administrador</h2><p>Pedidos, choferes y asignaciones</p></div>
         <svg class="icon chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
       </div>
       <div class="role-card" data-role="driver">
         <div class="role-icon-wrap driver">
           <svg class="icon lg" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
         </div>
-        <div class="role-text">
-          <h2>Chofer</h2>
-          <p>Ver asignaciones y navegar</p>
-        </div>
+        <div class="role-text"><h2>Chofer</h2><p>Ver asignaciones y navegar</p></div>
         <svg class="icon chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
       </div>
     </div>
@@ -271,7 +253,6 @@ body{display:flex;flex-direction:column}
   </div>
 </div>
 
-<!-- ========== APP ========== -->
 <div id="app" class="app hidden">
   <header>
     <div class="header-left">
@@ -294,8 +275,7 @@ body{display:flex;flex-direction:column}
       <div id="map"></div>
       <button class="map-fab" id="center-drivers-btn" title="Centrar en choferes" onclick="App.centerOnDrivers()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+          <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
         </svg>
       </button>
     </div>
@@ -512,7 +492,6 @@ const App = {
     }
   },
 
-  // ===== MAPA =====
   initMap() {
     this.state.map = L.map('map', { zoomControl: false }).setView([19.4326, -99.1332], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -525,7 +504,6 @@ const App = {
     Object.values(this.state.markers).forEach(mk => m.removeLayer(mk));
     this.state.markers = {};
 
-    // Pines rojos: destinos de WhatsApp
     this.state.ubicaciones.forEach((u, i) => {
       const icon = L.divIcon({
         className: '',
@@ -536,7 +514,6 @@ const App = {
         .bindPopup(`<b>Destino WhatsApp</b><br><small>${new Date(u.timestamp).toLocaleString()}</small>`);
     });
 
-    // Pines naranjas: asignaciones GPS
     this.state.asignaciones.forEach(a => {
       const coords = this.parseCoords(a);
       if (!coords) return;
@@ -547,11 +524,9 @@ const App = {
         html: '<div style="background:#C77E00;border:2.5px solid #fff;width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(199,126,0,.5)"></div>',
         iconSize: [24, 24], iconAnchor: [12, 24]
       });
-      this.state.markers['a' + a.id] = L.marker([coords.lat, coords.lng], { icon }).addTo(m)
-        .bindPopup(`<b>Destino asignado</b>`);
+      this.state.markers['a' + a.id] = L.marker([coords.lat, coords.lng], { icon }).addTo(m);
     });
 
-    // Marcadores azules: choferes reales (solo admin los ve)
     if (this.state.role === 'admin') {
       this.state.choferes.forEach(c => {
         if (c.lat == null || c.lng == null) return;
@@ -586,10 +561,8 @@ const App = {
     this.state.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
   },
 
-  // ===== REPORTE DE UBICACIÓN DEL CHOFER =====
   async initDriverLocationUpdates() {
     if (this.state.role !== 'driver' || !this.state.driverId) return;
-    // Pedir permiso una vez al iniciar
     try {
       if (window.Capacitor?.Plugins?.Geolocation) {
         const status = await window.Capacitor.Plugins.Geolocation.checkPermissions();
@@ -597,16 +570,10 @@ const App = {
           await window.Capacitor.Plugins.Geolocation.requestPermissions();
         }
       }
-    } catch (e) { console.warn('Permiso ubicación:', e); }
-
-    // Reportar inmediatamente
+    } catch (e) { }
     await this.reportMyLocation();
-
-    // Reportar cada 60s
     if (this.state.driverLocTimer) clearInterval(this.state.driverLocTimer);
     this.state.driverLocTimer = setInterval(() => this.reportMyLocation(), DRIVER_REPORT_INTERVAL_MS);
-
-    // Reportar al volver a la app
     if (!this._visibilityHandler) {
       this._visibilityHandler = () => {
         if (!document.hidden && this.state.role === 'driver' && this.state.driverId) {
@@ -636,30 +603,20 @@ const App = {
         await new Promise((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(
             p => { lat = p.coords.latitude; lng = p.coords.longitude; resolve(); },
-            reject,
-            { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
+            reject, { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
           );
         });
       }
       if (lat == null || lng == null) return;
-
       const payload = { lat, lng, ubicacion_actualizada_en: new Date().toISOString() };
       await this.sbFetch(`choferes?id=eq.${encodeURIComponent(this.state.driverId)}`, {
-        method: 'PATCH',
-        body: payload,
-        prefer: 'return=minimal',
-        parseJson: false,
+        method: 'PATCH', body: payload, prefer: 'return=minimal', parseJson: false,
       });
-      // Refrescar estado local
       const idx = this.state.choferes.findIndex(c => String(c.id) === String(this.state.driverId));
       if (idx !== -1) Object.assign(this.state.choferes[idx], payload);
-    } catch (e) {
-      // Silencioso
-      console.warn('No se pudo reportar ubicación:', e.message || e);
-    }
+    } catch (e) { }
   },
 
-  // ===== UTILS =====
   formatRelativeTime(isoStr) {
     try {
       const then = new Date(isoStr).getTime();
@@ -754,10 +711,7 @@ const App = {
     if (!confirm('¿Marcar esta asignación como completada?')) return;
     try {
       await this.sbFetch(`pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
-        method: 'PATCH',
-        body: { estado: 'entregado' },
-        prefer: 'return=minimal',
-        parseJson: false,
+        method: 'PATCH', body: { estado: 'entregado' }, prefer: 'return=minimal', parseJson: false,
       });
       const idx = this.state.asignaciones.findIndex(a => String(a.id) === String(pedidoId));
       if (idx !== -1) this.state.asignaciones[idx].estado = 'entregado';
@@ -796,7 +750,7 @@ const App = {
       const watcherId = await bg.addWatcher(
         { backgroundMessage: 'En camino al cliente', backgroundTitle: 'Agua Rutas', requestPermissions: true, stale: false, distanceFilter: 25 },
         (location, error) => {
-          if (error) { return; }
+          if (error) return;
           if (!location) return;
           this.onLocationUpdate(location.latitude, location.longitude);
         }
@@ -811,7 +765,7 @@ const App = {
   async stopTracking() {
     const bg = this.getBGPlugin();
     if (!bg || !this.state.tracking) return;
-    try { await bg.removeWatcher({ id: this.state.tracking.watcherId }); } catch (e) { console.warn(e); }
+    try { await bg.removeWatcher({ id: this.state.tracking.watcherId }); } catch (e) { }
     this.state.tracking = null;
     this.render();
   },
@@ -1022,7 +976,7 @@ const App = {
     try {
       if (window.Capacitor?.Plugins?.App) {
         const r = await window.Capacitor.Plugins.App.getLaunchUrl();
-        if (r?.url) this.handleDeepLink(r.url);
+        if (r?.url) await this.handleDeepLink(r.url);
       }
     } catch (e) { }
   },
@@ -1035,16 +989,82 @@ const App = {
       }
     } catch (e) { }
   },
-  handleDeepLink(url) {
-    let lat = null, lng = null;
-    const m1 = url.match(/geo:([-\d.]+),([-\d.]+)/);
-    if (m1) { lat = parseFloat(m1[1]); lng = parseFloat(m1[2]); }
-    if ((lat === 0 && lng === 0) || lat === null) {
-      const q = url.match(/[?&]q=([-\d.]+),([-\d.]+)/);
-      if (q) { lat = parseFloat(q[1]); lng = parseFloat(q[2]); }
+
+  // ===== PARSER DE URLS DE GOOGLE MAPS Y GEO: =====
+  parseMapsUrl(url) {
+    if (!url) return null;
+    try {
+      const decoded = decodeURIComponent(url);
+
+      // 1) geo:LAT,LNG  o  geo:0,0?q=LAT,LNG
+      let m = decoded.match(/geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+
+      // 2) ?q=LAT,LNG  (maps.google.com/?q=…)
+      m = decoded.match(/[?&]q=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+
+      // 3) ?query=LAT,LNG  (maps/search/?api=1&query=…)
+      m = decoded.match(/[?&]query=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+
+      // 4) ?destination=LAT,LNG  (maps/dir/?api=1&destination=…)
+      m = decoded.match(/[?&]destination=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+
+      // 5) /maps/@LAT,LNG,Z  o  /maps/place/LAT,LNG  o  /maps/search/LAT,LNG
+      m = decoded.match(/\/maps\/(?:@|place|search)\/?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+
+      // 6) /maps/place/NAME/@LAT,LNG,Z
+      m = decoded.match(/\/maps\/place\/[^/]*\/@\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+
+      // 7) /maps/place/NAME/LAT,LNG (con o sin @)
+      m = decoded.match(/\/maps\/place\/[^/]+\/\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+
+      return null;
+    } catch { return null; }
+  },
+  async resolveShortMapsUrl(url) {
+    // Intenta seguir el redirect de enlaces cortos (maps.app.goo.gl / goo.gl/maps)
+    // para obtener la URL larga con coordenadas.
+    try {
+      const res = await fetch(url, { method: 'GET', redirect: 'follow' });
+      // res.url es la URL final después de redirects
+      if (res.url && res.url !== url) {
+        return this.parseMapsUrl(res.url);
+      }
+      // A veces el HTML contiene la URL canónica en og:url
+      const html = await res.text();
+      const ogMatch = html.match(/property=["']og:url["']\s+content=["']([^"']+)["']/i)
+                   || html.match(/rel=["']canonical["']\s+href=["']([^"']+)["']/i);
+      if (ogMatch) {
+        const parsed = this.parseMapsUrl(ogMatch[1]);
+        if (parsed) return parsed;
+      }
+      return this.parseMapsUrl(res.url || '');
+    } catch (e) {
+      console.warn('No se pudo resolver enlace corto:', e);
+      return null;
     }
-    if (isNaN(lat) || isNaN(lng)) return;
-    this.addUbicacion(lat, lng);
+  },
+  async handleDeepLink(url) {
+    if (!url) return;
+    // 1) Intento directo
+    let coords = this.parseMapsUrl(url);
+
+    // 2) Si no hay coords y es enlace corto, intento resolverlo
+    if (!coords && /(maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(url)) {
+      coords = await this.resolveShortMapsUrl(url);
+    }
+
+    if (!coords) {
+      this.showToast('No se pudo leer la ubicación del enlace', 'error');
+      return;
+    }
+    this.addUbicacion(coords.lat, coords.lng);
   },
 
   navigateTo(pedidoId, lat, lng) {
@@ -1207,7 +1227,7 @@ const App = {
 
   renderUbicacionesList() {
     if (this.state.ubicaciones.length === 0) {
-      return `<p class="empty">Aún no has recibido ubicaciones por WhatsApp</p>`;
+      return `<p class="empty">Aún no has recibido ubicaciones</p>`;
     }
     return this.state.ubicaciones.slice().reverse().map((u, revIdx) => {
       const realIdx = this.state.ubicaciones.length - 1 - revIdx;
@@ -1291,7 +1311,7 @@ const App = {
       ${this.renderPedidosList()}
 
       <div class="panel-title">
-        ${ICONS.pin} Ubicaciones de WhatsApp
+        ${ICONS.pin} Ubicaciones recibidas
         <span class="count">${this.state.ubicaciones.length}</span>
       </div>
       ${this.renderUbicacionesList()}
@@ -1318,7 +1338,7 @@ const App = {
       ${this.renderAsignacionesList(false)}
 
       <div class="panel-title" style="margin-top:20px">
-        ${ICONS.pin} Ubicaciones de WhatsApp (local)
+        ${ICONS.pin} Ubicaciones recibidas (local)
         <span class="count">${this.state.ubicaciones.length}</span>
       </div>
       ${this.renderUbicacionesList()}
