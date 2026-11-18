@@ -1,6 +1,6 @@
 // Parchea AndroidManifest.xml para:
 //  - Recibir ubicaciones de WhatsApp (geo:)
-//  - Recibir enlaces de Google Maps (https://maps.google.com, etc.)
+//  - Recibir enlaces de Google Maps (https://maps.google.com, maps.app.goo.gl, etc.)
 //  - Permisos de ubicación, notificaciones y foreground service
 const fs = require('fs');
 const path = require('path');
@@ -45,7 +45,8 @@ if (!manifest.includes('android:scheme="geo"')) {
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="geo" />
             </intent-filter>
-            <!-- Recibir enlaces de Google Maps: www.google.com/maps -->
+
+            <!-- Recibir enlaces de Google Maps (www.google.com/maps) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -53,7 +54,8 @@ if (!manifest.includes('android:scheme="geo"')) {
                 <data android:scheme="https" android:host="www.google.com" android:pathPrefix="/maps" />
                 <data android:scheme="http"  android:host="www.google.com" android:pathPrefix="/maps" />
             </intent-filter>
-            <!-- Recibir enlaces de Google Maps: maps.google.com -->
+
+            <!-- Recibir enlaces de Google Maps (maps.google.com) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -61,13 +63,15 @@ if (!manifest.includes('android:scheme="geo"')) {
                 <data android:scheme="https" android:host="maps.google.com" />
                 <data android:scheme="http"  android:host="maps.google.com" />
             </intent-filter>
-            <!-- Recibir enlaces cortos: maps.app.goo.gl -->
-            <intent-filter>
+
+            <!-- Recibir enlaces cortos: maps.app.goo.gl (REQUIERE autoVerify) -->
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="maps.app.goo.gl" />
+                <data android:scheme="https" android:host="maps.app.goo.gl" android:pathPrefix="/" />
             </intent-filter>
+
             <!-- Recibir enlaces cortos viejos: goo.gl/maps -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -83,7 +87,7 @@ if (!manifest.includes('android:scheme="geo"')) {
   manifest =
     manifest.substring(0, idxEnd) + intentFilters + '\n        ' + manifest.substring(idxEnd);
   changed = true;
-  console.log('✅ Intent-filters (geo + Google Maps) agregados');
+  console.log('✅ Intent-filters (geo + Google Maps + App Links) agregados');
 }
 
 // --- 3. Permisos ---
