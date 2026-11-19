@@ -43,6 +43,7 @@ body{display:flex;flex-direction:column}
 .splash-loader span:nth-child(2){animation-delay:.15s}
 .splash-loader span:nth-child(3){animation-delay:.3s}
 @keyframes dotPulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes selfPulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.6);opacity:0}}
 
 .login{position:fixed;inset:0;z-index:900;background:var(--bg);display:flex;flex-direction:column;padding:32px 24px;overflow-y:auto}
 .login-header{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:40px;margin-bottom:48px}
@@ -111,6 +112,7 @@ body{display:flex;flex-direction:column}
 .card .meta{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:6px}
 .card .meta svg{opacity:.6}
 .driver-card-active{border-color:var(--accent);background:var(--accent-soft)}
+.self-card{border-color:var(--accent);background:var(--accent-soft);margin-bottom:12px}
 
 .btn{border:none;border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;width:100%;letter-spacing:.1px}
 .btn:active{transform:scale(.985)}
@@ -273,7 +275,7 @@ body{display:flex;flex-direction:column}
   <main>
     <div style="position:relative;flex:1;display:flex;flex-direction:column">
       <div id="map"></div>
-      <button class="map-fab" id="center-drivers-btn" title="Centrar en choferes" onclick="App.centerOnDrivers()">
+      <button class="map-fab" id="center-drivers-btn" title="Centrar mapa" onclick="App.centerOnDrivers()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
         </svg>
@@ -332,6 +334,9 @@ const App = {
     assignPedidoId: null,
     tracking: null,
     driverLocTimer: null,
+    myLat: null, myLng: null, myLastSeen: 0,
+    selfLocWatcherId: null,
+    selfLocStarted: false,
   },
 
   async init() {
@@ -339,7 +344,7 @@ const App = {
     this.setupLogin();
     this.setupLogout();
     this.setupDeepLinks();
-    this.setupShareTarget(); // Escuchar cuando comparten un enlace desde Google Maps
+    this.setupShareTarget();
     this.checkLaunchUrl();
 
     setTimeout(() => {
@@ -447,6 +452,7 @@ const App = {
       if (!confirm('¿Cerrar sesión?')) return;
       this.stopTracking();
       this.stopDriverLocationUpdates();
+      this.stopSelfLocationWatch();
       localStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem(SESSION_KEY);
       localStorage.removeItem(DRIVER_ID_KEY);
@@ -454,6 +460,10 @@ const App = {
       this.state.role = null;
       this.state.driverId = null;
       this.state.driverName = null;
+      this.state.myLat = null;
+      this.state.myLng = null;
+      this.state.selfLocStarted = false;
+      this._driverMapFitted = false;
       if (this.state.refreshTimer) { clearInterval(this.state.refreshTimer); this.state.refreshTimer = null; }
       document.getElementById('app').classList.add('hidden');
       document.getElementById('login').classList.remove('hidden');
@@ -499,12 +509,14 @@ const App = {
       attribution: '© OpenStreetMap', maxZoom: 19,
     }).addTo(this.state.map);
   },
+
   refreshMarkers() {
     if (!this.state.map) return;
     const m = this.state.map;
     Object.values(this.state.markers).forEach(mk => m.removeLayer(mk));
     this.state.markers = {};
 
+    // Destinos de WhatsApp (rojo)
     this.state.ubicaciones.forEach((u, i) => {
       const icon = L.divIcon({
         className: '',
@@ -515,6 +527,7 @@ const App = {
         .bindPopup(`<b>Destino WhatsApp</b><br><small>${new Date(u.timestamp).toLocaleString()}</small>`);
     });
 
+    // Mis asignaciones / destinos (naranja)
     this.state.asignaciones.forEach(a => {
       const coords = this.parseCoords(a);
       if (!coords) return;
@@ -522,12 +535,29 @@ const App = {
       if (isDone) return;
       const icon = L.divIcon({
         className: '',
-        html: '<div style="background:#C77E00;border:2.5px solid #fff;width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(199,126,0,.5)"></div>',
-        iconSize: [24, 24], iconAnchor: [12, 24]
+        html: '<div style="background:#C77E00;border:2.5px solid #fff;width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(199,126,0,.5)"></div>',
+        iconSize: [26, 26], iconAnchor: [13, 26]
       });
-      this.state.markers['a' + a.id] = L.marker([coords.lat, coords.lng], { icon }).addTo(m);
+      const label = this.state.role === 'driver' ? 'Tu destino' : 'Destino asignado';
+      this.state.markers['a' + a.id] = L.marker([coords.lat, coords.lng], { icon }).addTo(m)
+        .bindPopup(`<b>${label}</b><br><small>${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}</small>`);
     });
 
+    // Mi ubicación (chofer) - punto azul pulsante
+    if (this.state.role === 'driver' && this.state.myLat != null && this.state.myLng != null) {
+      const selfIcon = L.divIcon({
+        className: '',
+        html: `<div style="position:relative">
+            <div style="position:absolute;inset:-8px;background:rgba(79,107,237,.28);border-radius:50%;animation:selfPulse 2s ease-out infinite"></div>
+            <div style="background:#4F6BED;border:3px solid #fff;width:20px;height:20px;border-radius:50%;box-shadow:0 2px 10px rgba(79,107,237,.6);position:relative;z-index:1"></div>
+          </div>`,
+        iconSize: [20, 20], iconAnchor: [10, 10]
+      });
+      this.state.markers['self'] = L.marker([this.state.myLat, this.state.myLng], { icon: selfIcon, zIndexOffset: 1000 }).addTo(m)
+        .bindPopup(`<b>Estás aquí</b>`);
+    }
+
+    // Todos los choferes (admin) - azul con carro
     if (this.state.role === 'admin') {
       this.state.choferes.forEach(c => {
         if (c.lat == null || c.lng == null) return;
@@ -548,7 +578,18 @@ const App = {
       });
     }
   },
+
   centerOnDrivers() {
+    // Chofer: centrar en su propia ubicación
+    if (this.state.role === 'driver') {
+      if (this.state.myLat != null && this.state.myLng != null) {
+        this.state.map.setView([this.state.myLat, this.state.myLng], 16);
+      } else {
+        this.showToast('Esperando tu ubicación GPS…', 'error');
+      }
+      return;
+    }
+    // Admin: centrar en todos los choferes
     const withLoc = this.state.choferes.filter(c => c.lat != null && c.lng != null);
     if (withLoc.length === 0) {
       this.showToast('Aún no hay ubicaciones de choferes', 'error');
@@ -562,6 +603,84 @@ const App = {
     this.state.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
   },
 
+  fitMapToDriverView() {
+    const points = [];
+    if (this.state.myLat != null && this.state.myLng != null) {
+      points.push([this.state.myLat, this.state.myLng]);
+    }
+    this.state.asignaciones.forEach(a => {
+      const est = String(a.estado || '').toLowerCase();
+      if (est === 'entregado' || est === 'completado' || est === 'cancelado') return;
+      const c = this.parseCoords(a);
+      if (c) points.push([c.lat, c.lng]);
+    });
+    if (points.length === 0) return;
+    if (points.length === 1) {
+      this.state.map.setView(points[0], 15);
+    } else {
+      const bounds = L.latLngBounds(points);
+      this.state.map.fitBounds(bounds, { padding: [60, 60], maxZoom: 16 });
+    }
+  },
+
+  // ===== WATCH DE UBICACIÓN PROPIA (para chofer) =====
+  async startSelfLocationWatch() {
+    if (this.state.selfLocStarted) return;
+    this.state.selfLocStarted = true;
+
+    const onPosition = (lat, lng) => {
+      const prevLat = this.state.myLat;
+      const prevLng = this.state.myLng;
+      this.state.myLat = lat;
+      this.state.myLng = lng;
+      this.state.myLastSeen = Date.now();
+      // Solo refrescar si se movió >5m o es la primera vez
+      if (prevLat == null || prevLng == null) {
+        this.refreshMarkers();
+        if (!this._driverMapFitted) {
+          this._driverMapFitted = true;
+          setTimeout(() => this.fitMapToDriverView(), 150);
+        }
+      } else {
+        const d = this.haversineMeters(prevLat, prevLng, lat, lng);
+        if (d > 5) this.refreshMarkers();
+      }
+    };
+
+    try {
+      if (window.Capacitor?.Plugins?.Geolocation) {
+        const id = await window.Capacitor.Plugins.Geolocation.watchPosition(
+          { enableHighAccuracy: true, timeout: 20000, maximumAge: 5000 },
+          (pos, err) => {
+            if (err) return;
+            if (pos && pos.coords) onPosition(pos.coords.latitude, pos.coords.longitude);
+          }
+        );
+        this.state.selfLocWatcherId = id;
+      } else if (navigator.geolocation) {
+        this.state.selfLocWatcherId = navigator.geolocation.watchPosition(
+          (pos) => onPosition(pos.coords.latitude, pos.coords.longitude),
+          (err) => console.warn('GPS watch error', err),
+          { enableHighAccuracy: true, timeout: 20000, maximumAge: 5000 }
+        );
+      }
+    } catch (e) {
+      console.warn('No se pudo iniciar watch de ubicación', e);
+    }
+  },
+  async stopSelfLocationWatch() {
+    if (!this.state.selfLocStarted) return;
+    this.state.selfLocStarted = false;
+    try {
+      if (window.Capacitor?.Plugins?.Geolocation && this.state.selfLocWatcherId) {
+        await window.Capacitor.Plugins.Geolocation.clearWatch({ id: this.state.selfLocWatcherId });
+      } else if (navigator.geolocation && this.state.selfLocWatcherId != null) {
+        navigator.geolocation.clearWatch(this.state.selfLocWatcherId);
+      }
+    } catch (e) { }
+    this.state.selfLocWatcherId = null;
+  },
+
   async initDriverLocationUpdates() {
     if (this.state.role !== 'driver' || !this.state.driverId) return;
     try {
@@ -572,13 +691,20 @@ const App = {
         }
       }
     } catch (e) { }
-    await this.reportMyLocation();
+
+    // Iniciar watch de ubicación propia (para el mapa)
+    this.startSelfLocationWatch();
+
+    // Reportar al servidor cada 60s
     if (this.state.driverLocTimer) clearInterval(this.state.driverLocTimer);
     this.state.driverLocTimer = setInterval(() => this.reportMyLocation(), DRIVER_REPORT_INTERVAL_MS);
+    setTimeout(() => this.reportMyLocation(), 3000);
+
     if (!this._visibilityHandler) {
       this._visibilityHandler = () => {
         if (!document.hidden && this.state.role === 'driver' && this.state.driverId) {
           this.reportMyLocation();
+          this.refreshMarkers();
         }
       };
       document.addEventListener('visibilitychange', this._visibilityHandler);
@@ -593,22 +719,27 @@ const App = {
   async reportMyLocation() {
     if (this.state.role !== 'driver' || !this.state.driverId) return;
     try {
-      let lat = null, lng = null;
-      if (window.Capacitor?.Plugins?.Geolocation) {
-        const p = await window.Capacitor.Plugins.Geolocation.getCurrentPosition({
-          enableHighAccuracy: false, timeout: 12000, maximumAge: 60000
-        });
-        lat = p.coords.latitude;
-        lng = p.coords.longitude;
-      } else if (navigator.geolocation) {
-        await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(
-            p => { lat = p.coords.latitude; lng = p.coords.longitude; resolve(); },
-            reject, { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
-          );
-        });
+      let lat = this.state.myLat;
+      let lng = this.state.myLng;
+
+      if (lat == null || lng == null) {
+        if (window.Capacitor?.Plugins?.Geolocation) {
+          const p = await window.Capacitor.Plugins.Geolocation.getCurrentPosition({
+            enableHighAccuracy: false, timeout: 12000, maximumAge: 60000
+          });
+          lat = p.coords.latitude;
+          lng = p.coords.longitude;
+        } else if (navigator.geolocation) {
+          await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+              p => { lat = p.coords.latitude; lng = p.coords.longitude; resolve(); },
+              reject, { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
+            );
+          });
+        }
       }
       if (lat == null || lng == null) return;
+
       const payload = { lat, lng, ubicacion_actualizada_en: new Date().toISOString() };
       await this.sbFetch(`choferes?id=eq.${encodeURIComponent(this.state.driverId)}`, {
         method: 'PATCH', body: payload, prefer: 'return=minimal', parseJson: false,
@@ -701,6 +832,13 @@ const App = {
       const todas = Array.isArray(data) ? data : [];
       this.state.asignaciones = todas.filter(p => this.isGpsAssignment(p));
       this.refreshMarkers();
+
+      // Auto-centrar en chofer la primera vez
+      if (this.state.role === 'driver' && !this._driverMapFitted &&
+          (this.state.myLat != null || this.state.asignaciones.length > 0)) {
+        this._driverMapFitted = true;
+        setTimeout(() => this.fitMapToDriverView(), 200);
+      }
     } catch (e) {
       this.state.errorAsignaciones = e.message || String(e);
     } finally {
@@ -991,7 +1129,6 @@ const App = {
     } catch (e) { }
   },
 
-  // ===== SHARE TARGET (Recibir enlaces compartidos de Google Maps) =====
   setupShareTarget() {
     try {
       if (window.Capacitor?.Plugins?.ShareTarget) {
@@ -999,7 +1136,6 @@ const App = {
           console.log('Contenido compartido recibido:', data);
           const sharedText = data.text || data.title || '';
           if (sharedText) {
-            // Extraer la primera URL del texto
             const urlMatch = sharedText.match(/https?:\/\/[^\s]+/);
             const urlToParse = urlMatch ? urlMatch[0] : sharedText;
             this.handleDeepLink(urlToParse);
@@ -1264,6 +1400,9 @@ const App = {
       const navBtn = coords
         ? `<button class="btn accent" onclick="App.navigateTo('${this.escape(String(a.id))}', ${coords.lat}, ${coords.lng})">${ICONS.nav} Navegar en Google Maps</button>`
         : `<button class="btn accent" onclick="App.navigateByAddress('${this.escape(a.direccion || '')}')">${ICONS.nav} Buscar dirección en Google Maps</button>`;
+      const verBtn = coords
+        ? `<button class="btn ghost" onclick="App.state.map.setView([${coords.lat}, ${coords.lng}], 16)">${ICONS.pin} Ver destino en el mapa</button>`
+        : '';
       return `
         <div class="card">
           <div class="card-header">
@@ -1273,6 +1412,7 @@ const App = {
           </div>
           ${fecha ? `<div class="meta">${ICONS.clock} ${this.escape(fecha)}</div>` : ''}
           ${forAdmin ? `<div class="meta">${ICONS.driver} ${this.escape(nombreChofer)}</div>` : ''}
+          ${verBtn}
           ${navBtn}
           ${isTracking ? `<button class="btn ghost" onclick="App.stopTracking()">${ICONS.stop} Detener rastreo</button>` : ''}
           ${!forAdmin ? `<button class="btn success" onclick="App.completarAsignacion('${this.escape(String(a.id))}')">
@@ -1322,7 +1462,25 @@ const App = {
   },
 
   renderDriver() {
+    const hasSelf = this.state.myLat != null && this.state.myLng != null;
+    const selfCard = `
+      <div class="card self-card">
+        <div class="card-header">
+          ${ICONS.gps}
+          <h3>Tu ubicación</h3>
+          <span class="badge live" style="margin-left:auto">${hasSelf ? 'En vivo' : 'Buscando…'}</span>
+        </div>
+        ${hasSelf
+          ? `<div class="meta">${ICONS.pin} ${this.state.myLat.toFixed(5)}, ${this.state.myLng.toFixed(5)}</div>
+             <div class="meta">${ICONS.clock} ${this.formatRelativeTime(new Date(this.state.myLastSeen).toISOString())}</div>
+             <button class="btn ghost" onclick="App.centerOnDrivers()">${ICONS.nav} Centrar en mí</button>`
+          : `<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Obteniendo tu posición GPS…</p>
+             <button class="btn ghost" onclick="App.centerOnDrivers()">${ICONS.nav} Reintentar</button>`}
+      </div>
+    `;
     return `
+      ${selfCard}
+
       <div class="panel-title">
         ${ICONS.gps} Mis asignaciones
         <span class="count">${this.state.asignaciones.length}</span>
