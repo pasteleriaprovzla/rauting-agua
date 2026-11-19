@@ -28,11 +28,20 @@ jobs:
       - name: Añadir plataforma Android
         run: npx cap add android
 
+      - name: Sincronizar assets con Capacitor
+        run: npx cap sync android
+
       - name: Parchear AndroidManifest
         run: node scripts/patch-manifest.js
 
-      - name: Sincronizar assets con Capacitor
-        run: npx cap sync android
+      - name: Parchear MainActivity para recibir shares
+        run: node scripts/patch-main-activity.js
+
+      - name: Verificar permisos en el manifest
+        run: |
+          echo "===== PERMISOS Y FILTROS EN AndroidManifest.xml ====="
+          grep -E "uses-permission|launchMode|scheme|mimeType" android/app/src/main/AndroidManifest.xml || true
+          echo "===================================================="
 
       - name: Compilar APK debug
         run: |
