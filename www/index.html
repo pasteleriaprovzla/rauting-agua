@@ -358,6 +358,49 @@ const App = {
     }, 1800);
   },
 
+  // ===== SHARE TARGET (Java inyecta window.__pendingShareData) =====
+  setupShareTarget() {
+    window.__aguaRutasConsumeShare = () => {
+      if (window.__pendingShareData) {
+        const data = window.__pendingShareData;
+        window.__pendingShareData = null;
+        this.processSharedText(data);
+      }
+    };
+
+    window.addEventListener('nativeShareReceived', (event) => {
+      this.processSharedText(event.detail?.text || '');
+    });
+
+    window.__aguaRutasReady = true;
+
+    if (window.__pendingShareData) {
+      setTimeout(() => {
+        if (window.__aguaRutasConsumeShare) window.__aguaRutasConsumeShare();
+      }, 0);
+    }
+
+    if (this._sharePoll) clearInterval(this._sharePoll);
+    let attempts = 0;
+    this._sharePoll = setInterval(() => {
+      if (window.__pendingShareData && window.__aguaRutasConsumeShare) {
+        window.__aguaRutasConsumeShare();
+      }
+      if (++attempts > 20) {
+        clearInterval(this._sharePoll);
+        this._sharePoll = null;
+      }
+    }, 500);
+  },
+
+  processSharedText(sharedText) {
+    if (!sharedText) return;
+    console.log('Share recibido:', sharedText);
+    const urlMatch = String(sharedText).match(/https?:\/\/[^\s]+/);
+    const urlToParse = urlMatch ? urlMatch[0] : sharedText;
+    this.handleDeepLink(urlToParse);
+  },
+
   setupLogin() {
     document.querySelectorAll('.role-card[data-role]').forEach(card => {
       card.addEventListener('click', () => this.showPasswordForm(card.dataset.role));
@@ -516,7 +559,6 @@ const App = {
     Object.values(this.state.markers).forEach(mk => m.removeLayer(mk));
     this.state.markers = {};
 
-    // Destinos de WhatsApp (rojo)
     this.state.ubicaciones.forEach((u, i) => {
       const icon = L.divIcon({
         className: '',
@@ -527,7 +569,6 @@ const App = {
         .bindPopup(`<b>Destino WhatsApp</b><br><small>${new Date(u.timestamp).toLocaleString()}</small>`);
     });
 
-    // Mis asignaciones / destinos (naranja)
     this.state.asignaciones.forEach(a => {
       const coords = this.parseCoords(a);
       if (!coords) return;
@@ -543,7 +584,6 @@ const App = {
         .bindPopup(`<b>${label}</b><br><small>${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}</small>`);
     });
 
-    // Mi ubicación (chofer) - punto azul pulsante
     if (this.state.role === 'driver' && this.state.myLat != null && this.state.myLng != null) {
       const selfIcon = L.divIcon({
         className: '',
@@ -557,7 +597,6 @@ const App = {
         .bindPopup(`<b>Estás aquí</b>`);
     }
 
-    // Todos los choferes (admin) - azul con carro
     if (this.state.role === 'admin') {
       this.state.choferes.forEach(c => {
         if (c.lat == null || c.lng == null) return;
@@ -580,7 +619,6 @@ const App = {
   },
 
   centerOnDrivers() {
-    // Chofer: centrar en su propia ubicación
     if (this.state.role === 'driver') {
       if (this.state.myLat != null && this.state.myLng != null) {
         this.state.map.setView([this.state.myLat, this.state.myLng], 16);
@@ -589,7 +627,6 @@ const App = {
       }
       return;
     }
-    // Admin: centrar en todos los choferes
     const withLoc = this.state.choferes.filter(c => c.lat != null && c.lng != null);
     if (withLoc.length === 0) {
       this.showToast('Aún no hay ubicaciones de choferes', 'error');
@@ -623,7 +660,6 @@ const App = {
     }
   },
 
-  // ===== WATCH DE UBICACIÓN PROPIA (para chofer) =====
   async startSelfLocationWatch() {
     if (this.state.selfLocStarted) return;
     this.state.selfLocStarted = true;
@@ -634,7 +670,6 @@ const App = {
       this.state.myLat = lat;
       this.state.myLng = lng;
       this.state.myLastSeen = Date.now();
-      // Solo refrescar si se movió >5m o es la primera vez
       if (prevLat == null || prevLng == null) {
         this.refreshMarkers();
         if (!this._driverMapFitted) {
@@ -692,10 +727,8 @@ const App = {
       }
     } catch (e) { }
 
-    // Iniciar watch de ubicación propia (para el mapa)
     this.startSelfLocationWatch();
 
-    // Reportar al servidor cada 60s
     if (this.state.driverLocTimer) clearInterval(this.state.driverLocTimer);
     this.state.driverLocTimer = setInterval(() => this.reportMyLocation(), DRIVER_REPORT_INTERVAL_MS);
     setTimeout(() => this.reportMyLocation(), 3000);
@@ -833,7 +866,6 @@ const App = {
       this.state.asignaciones = todas.filter(p => this.isGpsAssignment(p));
       this.refreshMarkers();
 
-      // Auto-centrar en chofer la primera vez
       if (this.state.role === 'driver' && !this._driverMapFitted &&
           (this.state.myLat != null || this.state.asignaciones.length > 0)) {
         this._driverMapFitted = true;
@@ -1106,7 +1138,7 @@ const App = {
     this.state.ubicaciones.push(u);
     this.saveUbicaciones();
     this.refreshMarkers();
-    this.state.map.setView([lat, lng], 15);
+    if (this.state.map) this.state.map.setView([lat, lng], 15);
     this.showToast('Ubicación recibida', 'success');
     if (this.state.role) this.render();
   },
@@ -1127,24 +1159,6 @@ const App = {
         });
       }
     } catch (e) { }
-  },
-
-  setupShareTarget() {
-    try {
-      if (window.Capacitor?.Plugins?.ShareTarget) {
-        window.Capacitor.Plugins.ShareTarget.addListener('shareReceived', (data) => {
-          console.log('Contenido compartido recibido:', data);
-          const sharedText = data.text || data.title || '';
-          if (sharedText) {
-            const urlMatch = sharedText.match(/https?:\/\/[^\s]+/);
-            const urlToParse = urlMatch ? urlMatch[0] : sharedText;
-            this.handleDeepLink(urlToParse);
-          }
-        });
-      }
-    } catch (e) {
-      console.warn('ShareTarget no disponible', e);
-    }
   },
 
   parseMapsUrl(url) {
@@ -1330,7 +1344,6 @@ const App = {
       Los activos se actualizaron en los últimos 10 min
     </p>`;
     return header + this.state.choferes.map(c => {
-      const activo = c.activo !== false;
       const hasLoc = c.lat != null && c.lng != null;
       const ts = c.ubicacion_actualizada_en ? new Date(c.ubicacion_actualizada_en).getTime() : 0;
       const isRecent = ts && (Date.now() - ts < DRIVER_ACTIVE_THRESHOLD_MS);
