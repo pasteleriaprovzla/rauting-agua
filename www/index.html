@@ -166,9 +166,70 @@ body{display:flex;flex-direction:column}
 .toast.success{background:var(--success)}
 .toast.error{background:var(--danger)}
 
-.map-fab{position:absolute;right:14px;bottom:calc(58vh + 14px);z-index:500;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .15s}
-.map-fab:hover{color:var(--ink);box-shadow:var(--shadow-md)}
+.map-fab{position:absolute;right:14px;bottom:14px;z-index:500;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .15s}
+.map-fab:hover{color:var(--ink);box-shadow:0 4px 12px rgba(10,37,64,.12)}
 .map-fab svg{width:20px;height:20px}
+
+/* --- Botón flotante de registros / consola --- */
+.log-fab{position:fixed;top:74px;right:14px;z-index:960;width:44px;height:44px;border-radius:12px;background:var(--ink);color:#fff;border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(10,37,64,.3);cursor:pointer;transition:transform .15s,background .15s}
+.log-fab:active{transform:scale(.94)}
+.log-fab svg{width:21px;height:21px}
+.log-fab .log-error-dot{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);line-height:1}
+.log-modal-backdrop{position:fixed;inset:0;z-index:9700;background:rgba(10,37,64,.55);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+@media(min-width:600px){.log-modal-backdrop{align-items:center;padding:20px}}
+.log-panel{background:#0B1B2B;color:#D7E3F4;border-radius:18px 18px 0 0;width:100%;max-width:720px;height:78vh;max-height:78vh;display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:slideUp .22s ease;overflow:hidden}
+@media(min-width:600px){.log-panel{border-radius:16px;height:70vh}}
+.log-panel-header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
+.log-panel-header h2{font-size:14px;font-weight:700;color:#fff;letter-spacing:.2px;display:flex;align-items:center;gap:7px}
+.log-panel-header .log-count{margin-left:auto;font-size:11px;color:#8FA6C4;font-weight:600;white-space:nowrap}
+.log-panel-actions{display:flex;gap:6px;flex-shrink:0}
+.log-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#D7E3F4;border-radius:8px;padding:7px 10px;font-size:11px;font-weight:600;cursor:pointer}
+.log-btn:hover{background:rgba(255,255,255,.14)}
+.log-btn.close{background:rgba(217,63,63,.18);border-color:rgba(217,63,63,.4);color:#FFB4B4}
+.log-body{flex:1;overflow-y:auto;padding:8px 0;font-family:"SF Mono",Monaco,Consolas,monospace;font-size:11px;line-height:1.5;overscroll-behavior:contain}
+.log-line{display:flex;gap:8px;padding:4px 14px;border-bottom:1px solid rgba(255,255,255,.04);word-break:break-word}
+.log-line .log-time{color:#6E86A6;flex-shrink:0}
+.log-line .log-msg{white-space:pre-wrap;flex:1;min-width:0}
+.log-line.log .log-msg{color:#B9CBE2}
+.log-line.info .log-msg{color:#8FD3FF}
+.log-line.warn{background:rgba(199,126,0,.1)}
+.log-line.warn .log-msg{color:#FFD18A}
+.log-line.error{background:rgba(217,63,63,.13)}
+.log-line.error .log-msg{color:#FFA8A8}
+.log-empty{padding:30px 16px;text-align:center;color:#6E86A6;font-size:12px}
+
+/* --- Ruta secuencial del chofer --- */
+.route-summary{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow-xs)}
+.route-summary-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.route-summary-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.route-summary-title{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-.2px}
+.route-progress{height:7px;background:var(--bg-soft);border-radius:99px;overflow:hidden;margin-bottom:14px;border:1px solid var(--line)}
+.route-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#7FDBEE);border-radius:99px;transition:width .4s ease}
+.next-stop{background:var(--accent-soft);border:1px solid #DCE3FF;border-radius:var(--radius);padding:14px}
+.next-stop-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--accent-dark);font-weight:800;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.next-stop-title{font-size:14px;font-weight:700;color:var(--ink);line-height:1.4;margin-bottom:3px;word-break:break-word}
+.next-stop-meta{font-size:12px;color:var(--ink-soft);margin-bottom:10px}
+.next-stop-actions{display:flex;gap:8px}
+.next-stop-actions .btn{flex:1;margin-top:0}
+.route-done{background:var(--success-soft);border:1px solid #CBEBD9;border-radius:var(--radius);padding:16px;text-align:center;color:var(--success);font-size:14px;font-weight:700}
+.route-done small{display:block;font-size:12px;font-weight:500;color:var(--ink-soft);margin-top:5px}
+.order-badge{width:24px;height:24px;border-radius:50%;background:var(--bg-soft);border:1px solid var(--line);color:var(--ink-soft);font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.order-badge.next{background:var(--accent);border-color:var(--accent);color:#fff}
+.card.stop-card.next{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-soft),var(--bg));box-shadow:0 0 0 1px var(--accent-soft)}
+.distance-pill{font-size:11px;font-weight:700;color:var(--accent-dark);background:var(--accent-soft);border:1px solid #DCE3FF;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap}
+.card-actions .btn{flex:1;min-width:120px;margin-top:0}
+.delivered-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:8px;background:var(--bg);font-size:12px;color:var(--ink-soft)}
+.delivered-row .icon{color:var(--success)}
+.delivered-row .delivered-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.delivered-row .delivered-time{font-size:11px;color:var(--muted);flex-shrink:0}
+.route-hint{font-size:11px;color:var(--muted);line-height:1.6;background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px}
+.driver-progress{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:12px}
+.driver-progress:last-child{border-bottom:none}
+.driver-progress .name{font-weight:600;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.driver-progress .mini-bar{width:70px;height:6px;background:var(--bg-soft);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.driver-progress .mini-bar span{display:block;height:100%;background:var(--success)}
+.driver-progress .counts{font-size:11px;color:var(--muted);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -286,6 +347,15 @@ body{display:flex;flex-direction:column}
 </div>
 
 <div id="modal-root"></div>
+
+<button id="log-fab" class="log-fab hidden" type="button" onclick="Logger.open()" aria-label="Ver registros de la app" title="Registros de la app">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>
+  </svg>
+  <span id="log-error-dot" class="log-error-dot hidden">0</span>
+</button>
+<div id="log-root"></div>
+
 <div id="toast" class="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -320,6 +390,212 @@ const ICONS = {
   stop:    '<svg class="icon sm" viewBox="0 0 24 24"><rect width="14" height="14" x="5" y="5" rx="2"/></svg>',
 };
 
+// ===== Consola de registros (botón flotante) =====
+const Logger = {
+  entries: [],
+  max: 400,
+  storageKey: 'aguaRutasLogs',
+  _open: false,
+  _unreadErrors: 0,
+  _orig: null,
+  _persistTimer: null,
+
+  init() {
+    if (this._orig) return;
+    this._orig = {
+      log: console.log.bind(console),
+      info: (console.info || console.log).bind(console),
+      warn: console.warn.bind(console),
+      error: console.error.bind(console),
+    };
+
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          this.entries = parsed.filter(e => e && e.t && e.msg).slice(-this.max);
+        }
+      }
+    } catch (e) {}
+
+    const wrap = (level) => {
+      const original = this._orig[level] || this._orig.log;
+      console[level] = (...args) => {
+        try { this.add(level, args.map(a => this.stringify(a)).join(' ')); } catch (e) {}
+        original(...args);
+      };
+    };
+    ['log', 'info', 'warn', 'error'].forEach(wrap);
+
+    window.addEventListener('error', (event) => {
+      this.add('error', `Error no controlado: ${event.message || ''} ${event.filename || ''}:${event.lineno || 0}`);
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+      this.add('error', `Promesa rechazada: ${this.stringify(event.reason)}`);
+    });
+
+    this.add('info', '— Nueva sesión —');
+    this.updateBadge();
+  },
+
+  stringify(value) {
+    try {
+      if (value instanceof Error) return value.stack || value.message || String(value);
+      if (typeof value === 'string') return value;
+      if (value === null) return 'null';
+      if (value === undefined) return 'undefined';
+      if (typeof value === 'object') {
+        const seen = new WeakSet();
+        return JSON.stringify(value, (key, val) => {
+          if (val && typeof val === 'object') {
+            if (seen.has(val)) return '[circular]';
+            seen.add(val);
+          }
+          return val;
+        });
+      }
+      return String(value);
+    } catch (e) {
+      return String(value);
+    }
+  },
+
+  add(level, message) {
+    const safeLevel = ['log', 'info', 'warn', 'error'].includes(level) ? level : 'log';
+    const entry = {
+      t: Date.now(),
+      level: safeLevel,
+      msg: String(message == null ? '' : message).slice(0, 3000),
+    };
+    this.entries.push(entry);
+    if (this.entries.length > this.max) {
+      this.entries.splice(0, this.entries.length - this.max);
+    }
+    if (safeLevel === 'error' && !this._open) this._unreadErrors++;
+    this.schedulePersist();
+    this.updateBadge();
+    if (this._open) this.renderLines();
+  },
+
+  schedulePersist() {
+    if (this._persistTimer) return;
+    this._persistTimer = setTimeout(() => {
+      this._persistTimer = null;
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.entries.slice(-150)));
+      } catch (e) {}
+    }, 400);
+  },
+
+  updateBadge() {
+    const dot = document.getElementById('log-error-dot');
+    if (!dot) return;
+    if (this._unreadErrors > 0) {
+      dot.textContent = this._unreadErrors > 99 ? '99+' : String(this._unreadErrors);
+      dot.classList.remove('hidden');
+    } else {
+      dot.classList.add('hidden');
+    }
+  },
+
+  open() {
+    if (this._open) return;
+    this._open = true;
+    this._unreadErrors = 0;
+    this.updateBadge();
+    const root = document.getElementById('log-root');
+    if (!root) return;
+    root.innerHTML = `
+      <div class="log-modal-backdrop" id="log-backdrop">
+        <div class="log-panel" role="dialog" aria-modal="true" aria-label="Registros de la app">
+          <div class="log-panel-header">
+            <h2>
+              <svg class="icon sm" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+              Consola
+            </h2>
+            <span class="log-count" id="log-count"></span>
+            <div class="log-panel-actions">
+              <button class="log-btn" onclick="Logger.copy()">Copiar</button>
+              <button class="log-btn" onclick="Logger.clear()">Limpiar</button>
+              <button class="log-btn close" onclick="Logger.close()">Cerrar</button>
+            </div>
+          </div>
+          <div class="log-body" id="log-body"></div>
+        </div>
+      </div>`;
+    document.getElementById('log-backdrop').addEventListener('click', (e) => {
+      if (e.target.id === 'log-backdrop') this.close();
+    });
+    this.renderLines();
+  },
+
+  close() {
+    this._open = false;
+    const root = document.getElementById('log-root');
+    if (root) root.innerHTML = '';
+  },
+
+  clear() {
+    this.entries = [];
+    this._unreadErrors = 0;
+    this.updateBadge();
+    try { localStorage.removeItem(this.storageKey); } catch (e) {}
+    this.renderLines();
+  },
+
+  async copy() {
+    const text = this.entries
+      .map(e => `[${new Date(e.t).toLocaleTimeString()}] ${e.level.toUpperCase()}: ${e.msg}`)
+      .join('\n');
+    let ok = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      }
+    } catch (e) {}
+    if (!ok) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) { ok = false; }
+    }
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(ok ? 'Registros copiados' : 'No se pudo copiar', ok ? 'success' : 'error');
+    }
+  },
+
+  renderLines() {
+    const body = document.getElementById('log-body');
+    const count = document.getElementById('log-count');
+    if (!body) return;
+    const nearBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
+    if (this.entries.length === 0) {
+      body.innerHTML = '<div class="log-empty">Sin registros todavía</div>';
+    } else {
+      body.innerHTML = this.entries.map(e => {
+        const time = new Date(e.t).toLocaleTimeString();
+        return `<div class="log-line ${e.level}"><span class="log-time">${this.escapeHtml(time)}</span><span class="log-msg">${this.escapeHtml(e.msg)}</span></div>`;
+      }).join('');
+    }
+    if (count) count.textContent = `${this.entries.length} líneas`;
+    if (nearBottom) body.scrollTop = body.scrollHeight;
+  },
+
+  escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  },
+};
+
 const App = {
   state: {
     role: null,
@@ -337,9 +613,12 @@ const App = {
     myLat: null, myLng: null, myLastSeen: 0,
     selfLocWatcherId: null,
     selfLocStarted: false,
+    showDelivered: false,
   },
 
   async init() {
+    Logger.init();
+    Logger.add('info', 'Agua Rutas iniciada');
     this.loadUbicaciones();
     this.setupLogin();
     this.setupLogout();
@@ -351,6 +630,8 @@ const App = {
       document.getElementById('splash').classList.add('fade');
       setTimeout(() => {
         document.getElementById('splash').classList.add('hidden');
+        const logFab = document.getElementById('log-fab');
+        if (logFab) logFab.classList.remove('hidden');
         const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
         if (session) { this.state.role = session; this.startApp(); }
         else { document.getElementById('login').classList.remove('hidden'); }
@@ -360,19 +641,47 @@ const App = {
 
   // ===== SHARE TARGET (Java inyecta window.__pendingShareData) =====
   setupShareTarget() {
-    window.__aguaRutasConsumeShare = () => {
-      if (window.__pendingShareData) {
-        const data = window.__pendingShareData;
-        window.__pendingShareData = null;
+    const consume = () => {
+      const data = window.__pendingShareData;
+      if (!data) return;
+      window.__pendingShareData = null;
+      Logger.add('info', 'Share nativo recibido: ' + Logger.stringify(data));
+
+      if (typeof data === 'string') {
         this.processSharedText(data);
+        return;
+      }
+
+      if (data && data.lat != null && data.lng != null) {
+        this.addUbicacion(Number(data.lat), Number(data.lng), {
+          source: data.source || 'share',
+          url: data.url || '',
+          text: data.text || '',
+        });
+        if (data.error) Logger.add('warn', 'Aviso del share nativo: ' + data.error);
+        return;
+      }
+
+      this.processSharedText((data && (data.text || data.url)) || '');
+      if (data && data.error) {
+        Logger.add('error', 'Share nativo sin coordenadas: ' + data.error);
       }
     };
 
-    window.addEventListener('nativeShareReceived', (event) => {
-      this.processSharedText(event.detail?.text || '');
-    });
-
+    window.__aguaRutasConsumeShare = consume;
     window.__aguaRutasReady = true;
+
+    window.addEventListener('nativeShareReceived', (event) => {
+      const detail = event.detail;
+      if (detail && typeof detail === 'object' && detail.lat != null && detail.lng != null) {
+        this.addUbicacion(Number(detail.lat), Number(detail.lng), {
+          source: detail.source || 'share',
+          url: detail.url || '',
+        });
+      } else {
+        this.processSharedText((detail && (detail.text || detail)) || '');
+      }
+    });
 
     if (window.__pendingShareData) {
       setTimeout(() => {
@@ -386,7 +695,7 @@ const App = {
       if (window.__pendingShareData && window.__aguaRutasConsumeShare) {
         window.__aguaRutasConsumeShare();
       }
-      if (++attempts > 20) {
+      if (++attempts > 60) {
         clearInterval(this._sharePoll);
         this._sharePoll = null;
       }
@@ -395,10 +704,30 @@ const App = {
 
   processSharedText(sharedText) {
     if (!sharedText) return;
-    console.log('Share recibido:', sharedText);
-    const urlMatch = String(sharedText).match(/https?:\/\/[^\s]+/);
-    const urlToParse = urlMatch ? urlMatch[0] : sharedText;
-    this.handleDeepLink(urlToParse);
+    const text = String(sharedText);
+    Logger.add('info', 'Procesando texto compartido: ' + text.slice(0, 500));
+
+    let url = null;
+    const urlMatch = text.match(/https?:\/\/[^\s<>"']+/i);
+    if (urlMatch) url = urlMatch[0].replace(/[)\]},.;!?]+$/, '');
+    if (!url) {
+      const geoMatch = text.match(/geo:\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?/i);
+      if (geoMatch) url = geoMatch[0];
+    }
+
+    if (url) {
+      this.handleDeepLink(url);
+      return;
+    }
+
+    const coords = this.parseMapsUrl(text);
+    if (coords) {
+      this.addUbicacion(coords.lat, coords.lng, { source: 'text' });
+      return;
+    }
+
+    Logger.add('error', 'El texto compartido no contiene un enlace ni coordenadas válidas');
+    this.showToast('No se encontró una ubicación en el texto compartido', 'error');
   },
 
   setupLogin() {
@@ -523,6 +852,8 @@ const App = {
       ? 'Administrador'
       : `Chofer · ${this.state.driverName || ''}`.trim();
     document.getElementById('app-role-label').textContent = label;
+    Logger.add('info', 'Sesión iniciada: ' + label);
+    this._lastNextId = null;
     if (!this.state.map) this.initMap();
     this.render();
     this.refreshMarkers();
@@ -559,6 +890,7 @@ const App = {
     Object.values(this.state.markers).forEach(mk => m.removeLayer(mk));
     this.state.markers = {};
 
+    // Ubicaciones compartidas localmente (normalmente en el dispositivo del admin)
     this.state.ubicaciones.forEach((u, i) => {
       const icon = L.divIcon({
         className: '',
@@ -566,22 +898,33 @@ const App = {
         iconSize: [24, 24], iconAnchor: [12, 24]
       });
       this.state.markers['u' + i] = L.marker([u.lat, u.lng], { icon }).addTo(m)
-        .bindPopup(`<b>Destino WhatsApp</b><br><small>${new Date(u.timestamp).toLocaleString()}</small>`);
+        .bindPopup(`<b>Ubicación recibida</b><br><small>${new Date(u.timestamp).toLocaleString()}</small>`);
     });
 
-    this.state.asignaciones.forEach(a => {
+    // Paradas pendientes, numeradas por cercanía para el chofer.
+    // Las entregadas NO se dibujan: su pin desaparece del mapa.
+    const pending = this.getOrderedPendingAssignments();
+    const next = pending[0] || null;
+    pending.forEach((a, idx) => {
       const coords = this.parseCoords(a);
       if (!coords) return;
-      const isDone = String(a.estado || '').toLowerCase() === 'entregado';
-      if (isDone) return;
+      const isNext = next && String(a.id) === String(next.id);
+      const color = isNext ? '#4F6BED' : '#C77E00';
+      const size = isNext ? 34 : 28;
       const icon = L.divIcon({
         className: '',
-        html: '<div style="background:#C77E00;border:2.5px solid #fff;width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(199,126,0,.5)"></div>',
-        iconSize: [26, 26], iconAnchor: [13, 26]
+        html: `<div style="background:${color};border:2.5px solid #fff;width:${size}px;height:${size}px;border-radius:50%;box-shadow:0 2px 10px ${isNext ? 'rgba(79,107,237,.55)' : 'rgba(199,126,0,.45)'};display:flex;align-items:center;justify-content:center;color:#fff;font-size:${isNext ? 13 : 11}px;font-weight:800">${idx + 1}</div>`,
+        iconSize: [size, size], iconAnchor: [size / 2, size / 2]
       });
-      const label = this.state.role === 'driver' ? 'Tu destino' : 'Destino asignado';
-      this.state.markers['a' + a.id] = L.marker([coords.lat, coords.lng], { icon }).addTo(m)
-        .bindPopup(`<b>${label}</b><br><small>${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}</small>`);
+      const label = isNext ? 'Siguiente parada' : `Parada ${idx + 1}`;
+      const desc = this.describeAssignment(a);
+      const dist = this.assignmentDistance(a);
+      this.state.markers['a' + a.id] = L.marker([coords.lat, coords.lng], {
+        icon,
+        zIndexOffset: isNext ? 900 : 0,
+      }).addTo(m).bindPopup(
+        `<b>${label}</b><br><small>${this.escape(desc)}</small>${dist != null ? `<br><small>${this.formatDistance(dist)}</small>` : ''}`
+      );
     });
 
     if (this.state.role === 'driver' && this.state.myLat != null && this.state.myLng != null) {
@@ -595,6 +938,14 @@ const App = {
       });
       this.state.markers['self'] = L.marker([this.state.myLat, this.state.myLng], { icon: selfIcon, zIndexOffset: 1000 }).addTo(m)
         .bindPopup(`<b>Estás aquí</b>`);
+
+      const nextCoords = next ? this.parseCoords(next) : null;
+      if (nextCoords) {
+        this.state.markers['route-line'] = L.polyline(
+          [[this.state.myLat, this.state.myLng], [nextCoords.lat, nextCoords.lng]],
+          { color: '#4F6BED', weight: 4, opacity: .55, dashArray: '8 9' }
+        ).addTo(m);
+      }
     }
 
     if (this.state.role === 'admin') {
@@ -671,14 +1022,19 @@ const App = {
       this.state.myLng = lng;
       this.state.myLastSeen = Date.now();
       if (prevLat == null || prevLng == null) {
+        Logger.add('info', `GPS: primera ubicación ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
         this.refreshMarkers();
+        this.recomputeNextStop();
         if (!this._driverMapFitted) {
           this._driverMapFitted = true;
           setTimeout(() => this.fitMapToDriverView(), 150);
         }
       } else {
         const d = this.haversineMeters(prevLat, prevLng, lat, lng);
-        if (d > 5) this.refreshMarkers();
+        if (d > 15) {
+          this.refreshMarkers();
+          this.recomputeNextStop();
+        }
       }
     };
 
@@ -687,20 +1043,27 @@ const App = {
         const id = await window.Capacitor.Plugins.Geolocation.watchPosition(
           { enableHighAccuracy: true, timeout: 20000, maximumAge: 5000 },
           (pos, err) => {
-            if (err) return;
+            if (err) {
+              Logger.add('warn', 'GPS watch: ' + Logger.stringify(err));
+              return;
+            }
             if (pos && pos.coords) onPosition(pos.coords.latitude, pos.coords.longitude);
           }
         );
         this.state.selfLocWatcherId = id;
+        Logger.add('info', 'GPS: watch iniciado');
       } else if (navigator.geolocation) {
         this.state.selfLocWatcherId = navigator.geolocation.watchPosition(
           (pos) => onPosition(pos.coords.latitude, pos.coords.longitude),
-          (err) => console.warn('GPS watch error', err),
+          (err) => Logger.add('warn', 'GPS watch: ' + Logger.stringify(err)),
           { enableHighAccuracy: true, timeout: 20000, maximumAge: 5000 }
         );
+        Logger.add('info', 'GPS: watch web iniciado');
+      } else {
+        Logger.add('error', 'GPS: el dispositivo no soporta geolocalización');
       }
     } catch (e) {
-      console.warn('No se pudo iniciar watch de ubicación', e);
+      Logger.add('error', 'GPS: no se pudo iniciar el watch: ' + (e.message || e));
     }
   },
   async stopSelfLocationWatch() {
@@ -721,11 +1084,15 @@ const App = {
     try {
       if (window.Capacitor?.Plugins?.Geolocation) {
         const status = await window.Capacitor.Plugins.Geolocation.checkPermissions();
+        Logger.add('info', 'Permiso de ubicación: ' + (status.location || 'desconocido'));
         if (status.location !== 'granted') {
-          await window.Capacitor.Plugins.Geolocation.requestPermissions();
+          const requested = await window.Capacitor.Plugins.Geolocation.requestPermissions();
+          Logger.add('info', 'Permiso solicitado: ' + (requested.location || 'desconocido'));
         }
       }
-    } catch (e) { }
+    } catch (e) {
+      Logger.add('error', 'No se pudo verificar el permiso de ubicación: ' + (e.message || e));
+    }
 
     this.startSelfLocationWatch();
 
@@ -779,7 +1146,10 @@ const App = {
       });
       const idx = this.state.choferes.findIndex(c => String(c.id) === String(this.state.driverId));
       if (idx !== -1) Object.assign(this.state.choferes[idx], payload);
-    } catch (e) { }
+      Logger.add('log', `Ubicación del chofer reportada: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+    } catch (e) {
+      Logger.add('warn', 'No se pudo reportar la ubicación del chofer: ' + (e.message || e));
+    }
   },
 
   formatRelativeTime(isoStr) {
@@ -799,21 +1169,33 @@ const App = {
   },
 
   async sbFetch(path, opts = {}) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-      method: opts.method || 'GET',
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Accept': 'application/json',
-        ...(opts.body ? { 'Content-Type': 'application/json' } : {}),
-        ...(opts.prefer ? { 'Prefer': opts.prefer } : {}),
-      },
-      ...(opts.body ? { body: JSON.stringify(opts.body) } : {}),
-    });
+    const method = opts.method || 'GET';
+    const started = Date.now();
+    let res;
+    try {
+      res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        method,
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Accept': 'application/json',
+          ...(opts.body ? { 'Content-Type': 'application/json' } : {}),
+          ...(opts.prefer ? { 'Prefer': opts.prefer } : {}),
+        },
+        ...(opts.body ? { body: JSON.stringify(opts.body) } : {}),
+      });
+    } catch (e) {
+      Logger.add('error', `Supabase ${method} ${path} sin conexión: ${e.message || e}`);
+      throw e;
+    }
+
+    const ms = Date.now() - started;
     if (!res.ok) {
       const txt = await res.text();
+      Logger.add('error', `Supabase ${method} ${path} → ${res.status} (${ms} ms): ${txt.slice(0, 200)}`);
       throw new Error(`HTTP ${res.status}: ${txt.slice(0, 200)}`);
     }
+    Logger.add('log', `Supabase ${method} ${path} → ${res.status} (${ms} ms)`);
     if (opts.parseJson === false) return null;
     const text = await res.text();
     return text ? JSON.parse(text) : null;
@@ -835,20 +1217,119 @@ const App = {
   },
 
   isGpsAssignment(p) {
+    if (!p) return false;
     if (Array.isArray(p.items) && p.items.some(i => i && i.tipo === 'gps')) return true;
+    if (p.items && !Array.isArray(p.items) && typeof p.items === 'object' && p.items.gps) return true;
     return false;
   },
   parseCoords(p) {
+    if (!p) return null;
+    const read = (lat, lng) => {
+      const la = Number(lat);
+      const ln = Number(lng);
+      if (!isFinite(la) || !isFinite(ln)) return null;
+      if (Math.abs(la) > 90 || Math.abs(ln) > 180) return null;
+      if (Math.abs(la) < 0.000001 && Math.abs(ln) < 0.000001) return null;
+      return { lat: la, lng: ln };
+    };
+
     if (p.ubicacion_chofer) {
       const m = String(p.ubicacion_chofer).match(/^(-?[\d.]+)\s*,\s*(-?[\d.]+)$/);
-      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+      if (m) {
+        const coords = read(m[1], m[2]);
+        if (coords) return coords;
+      }
     }
     if (Array.isArray(p.items)) {
       const g = p.items.find(i => i && i.tipo === 'gps');
-      if (g && g.lat != null && g.lng != null) return { lat: Number(g.lat), lng: Number(g.lng) };
+      if (g) {
+        const coords = read(g.lat, g.lng);
+        if (coords) return coords;
+      }
+    }
+    if (p.items && !Array.isArray(p.items) && typeof p.items === 'object') {
+      const g = p.items.gps;
+      if (g && typeof g === 'object') {
+        const coords = read(g.lat, g.lng);
+        if (coords) return coords;
+      }
+      const coords = read(p.items.lat, p.items.lng);
+      if (coords) return coords;
     }
     return null;
   },
+
+  isAssignmentDone(a) {
+    const est = String((a && a.estado) || '').toLowerCase();
+    return est === 'entregado' || est === 'completado' || est === 'cancelado';
+  },
+  getPendingAssignments() {
+    return this.state.asignaciones.filter(a => !this.isAssignmentDone(a));
+  },
+  getDeliveredAssignments() {
+    return this.state.asignaciones.filter(a => this.isAssignmentDone(a));
+  },
+  assignmentTime(a) {
+    const t = a && a.created_at ? new Date(a.created_at).getTime() : 0;
+    return isNaN(t) ? 0 : t;
+  },
+  isTodayAssignment(a) {
+    const raw = a && (a.updated_at || a.created_at);
+    if (!raw) return false;
+    return new Date(raw).toDateString() === new Date().toDateString();
+  },
+  assignmentDistance(a) {
+    const c = this.parseCoords(a);
+    if (!c || this.state.myLat == null || this.state.myLng == null) return null;
+    return this.haversineMeters(this.state.myLat, this.state.myLng, c.lat, c.lng);
+  },
+  getOrderedPendingAssignments() {
+    const pending = this.getPendingAssignments();
+    const withDistance = pending.map(a => ({ a, d: this.assignmentDistance(a) }));
+
+    if (this.state.role === 'driver' && this.state.myLat != null) {
+      withDistance.sort((x, y) => {
+        const dx = x.d == null ? Infinity : x.d;
+        const dy = y.d == null ? Infinity : y.d;
+        if (dx !== dy) return dx - dy;
+        return this.assignmentTime(x.a) - this.assignmentTime(y.a);
+      });
+    } else {
+      withDistance.sort((x, y) => this.assignmentTime(x.a) - this.assignmentTime(y.a));
+    }
+    return withDistance.map(x => x.a);
+  },
+  getNextAssignment() {
+    return this.getOrderedPendingAssignments()[0] || null;
+  },
+  formatDistance(meters) {
+    if (meters == null || !isFinite(meters)) return '';
+    if (meters < 1000) return `${Math.max(0, Math.round(meters))} m`;
+    return `${(meters / 1000).toFixed(1)} km`;
+  },
+  describeAssignment(a) {
+    if (!a) return 'Sin parada';
+    const dir = a.direccion ? String(a.direccion).trim() : '';
+    if (dir && !/^Ubicaci[oó]n GPS/i.test(dir)) return dir;
+    const c = this.parseCoords(a);
+    if (c) return `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+    return dir || 'Sin ubicación';
+  },
+  recomputeNextStop() {
+    if (this.state.role !== 'driver') return;
+    const next = this.getNextAssignment();
+    const id = next ? String(next.id) : '';
+    if (id !== this._lastNextId) {
+      this._lastNextId = id;
+      Logger.add('info', 'Siguiente parada: ' + (next ? this.describeAssignment(next) : 'ninguna (ruta completada)'));
+      this.render();
+    }
+  },
+  toggleDelivered() {
+    this.state.showDelivered = !this.state.showDelivered;
+    this.render();
+  },
+
   async loadAsignacionesFromSupabase(silent = false) {
     this.state.loadingAsignaciones = true;
     this.state.errorAsignaciones = null;
@@ -864,6 +1345,8 @@ const App = {
       }
       const todas = Array.isArray(data) ? data : [];
       this.state.asignaciones = todas.filter(p => this.isGpsAssignment(p));
+      const pendientes = this.getPendingAssignments().length;
+      Logger.add('info', `Asignaciones cargadas: ${this.state.asignaciones.length} (${pendientes} pendientes, ${this.state.asignaciones.length - pendientes} entregadas)`);
       this.refreshMarkers();
 
       if (this.state.role === 'driver' && !this._driverMapFitted &&
@@ -871,27 +1354,70 @@ const App = {
         this._driverMapFitted = true;
         setTimeout(() => this.fitMapToDriverView(), 200);
       }
+      this.recomputeNextStop();
     } catch (e) {
       this.state.errorAsignaciones = e.message || String(e);
+      Logger.add('error', 'Error cargando asignaciones: ' + (e.message || e));
     } finally {
       this.state.loadingAsignaciones = false;
       this.render();
     }
   },
+
   async completarAsignacion(pedidoId) {
-    if (!confirm('¿Marcar esta asignación como completada?')) return;
+    return this.completeAssignment(pedidoId, { auto: false });
+  },
+
+  async completeAssignment(pedidoId, opts = {}) {
+    const a = this.state.asignaciones.find(x => String(x.id) === String(pedidoId));
+    if (!a) {
+      this.showToast('No se encontró la parada', 'error');
+      return;
+    }
+    if (this.isAssignmentDone(a)) return;
+    if (!opts.auto && !confirm('¿Marcar esta parada como entregada?')) return;
+
+    if (!this._completing) this._completing = new Set();
+    const key = String(pedidoId);
+    if (this._completing.has(key)) return;
+    this._completing.add(key);
+
     try {
       await this.sbFetch(`pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
-        method: 'PATCH', body: { estado: 'entregado' }, prefer: 'return=minimal', parseJson: false,
+        method: 'PATCH',
+        body: { estado: 'entregado' },
+        prefer: 'return=minimal',
+        parseJson: false,
       });
-      const idx = this.state.asignaciones.findIndex(a => String(a.id) === String(pedidoId));
-      if (idx !== -1) this.state.asignaciones[idx].estado = 'entregado';
-      this.stopTracking();
+      a.estado = 'entregado';
+      Logger.add('info', `Parada ${pedidoId} entregada${opts.auto ? ' automáticamente' : ''}`);
+
+      if (this.state.tracking && String(this.state.tracking.pedidoId) === String(pedidoId)) {
+        await this.stopTracking();
+      }
+
+      this._lastNextId = null;
       this.refreshMarkers();
       this.render();
-      this.showToast('Asignación completada', 'success');
+
+      const next = this.getNextAssignment();
+      if (next) {
+        const dist = this.assignmentDistance(next);
+        this.showToast(
+          `Entregado. Siguiente: ${this.describeAssignment(next)}${dist != null ? ' · ' + this.formatDistance(dist) : ''}`,
+          'success'
+        );
+        setTimeout(() => {
+          if (this.state.role === 'driver') this.fitMapToDriverView();
+        }, 250);
+      } else {
+        this.showToast('¡Ruta completada! No quedan paradas pendientes', 'success');
+      }
     } catch (e) {
+      Logger.add('error', 'Error al completar parada: ' + (e.message || e));
       this.showToast('Error al completar: ' + (e.message || e), 'error');
+    } finally {
+      this._completing.delete(key);
     }
   },
 
@@ -909,27 +1435,45 @@ const App = {
   },
   async startTracking(pedidoId, lat, lng) {
     const bg = this.getBGPlugin();
-    if (!bg) { this.showToast('Tracking no disponible (solo en APK)', 'error'); return; }
+    if (!bg) {
+      Logger.add('warn', 'Rastreo no disponible: falta el plugin de geolocalización en segundo plano');
+      this.showToast('Tracking no disponible (solo en APK)', 'error');
+      return;
+    }
     if (this.state.tracking && this.state.tracking.pedidoId === pedidoId) {
       this.showToast('Ya estás en camino a este destino', 'success');
       return;
     }
     await this.stopTracking();
     const hasNotif = await this.requestNotificationPermission();
-    if (!hasNotif) this.showToast('Sin permiso de notificaciones, el rastreo puede fallar', 'error');
+    if (!hasNotif) {
+      Logger.add('warn', 'Sin permiso de notificaciones; el rastreo puede fallar');
+      this.showToast('Sin permiso de notificaciones, el rastreo puede fallar', 'error');
+    }
     try {
       const watcherId = await bg.addWatcher(
-        { backgroundMessage: 'En camino al cliente', backgroundTitle: 'Agua Rutas', requestPermissions: true, stale: false, distanceFilter: 25 },
+        {
+          backgroundMessage: 'En camino al cliente',
+          backgroundTitle: 'Agua Rutas',
+          requestPermissions: true,
+          stale: false,
+          distanceFilter: 25,
+        },
         (location, error) => {
-          if (error) return;
+          if (error) {
+            Logger.add('error', 'Error de rastreo: ' + Logger.stringify(error));
+            return;
+          }
           if (!location) return;
           this.onLocationUpdate(location.latitude, location.longitude);
         }
       );
       this.state.tracking = { watcherId, pedidoId, lat, lng };
+      Logger.add('info', `Rastreo iniciado para la parada ${pedidoId}`);
       this.showToast('Rastreo activo: te avisaremos al llegar', 'success');
       this.render();
     } catch (e) {
+      Logger.add('error', 'No se pudo iniciar el rastreo: ' + (e.message || e));
       this.showToast('Error al iniciar rastreo: ' + (e.message || e), 'error');
     }
   },
@@ -937,6 +1481,7 @@ const App = {
     const bg = this.getBGPlugin();
     if (!bg || !this.state.tracking) return;
     try { await bg.removeWatcher({ id: this.state.tracking.watcherId }); } catch (e) { }
+    Logger.add('info', 'Rastreo detenido');
     this.state.tracking = null;
     this.render();
   },
@@ -949,22 +1494,17 @@ const App = {
     return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   },
   async onLocationUpdate(currentLat, currentLng) {
+    this.state.myLat = currentLat;
+    this.state.myLng = currentLng;
+    this.state.myLastSeen = Date.now();
+
     const t = this.state.tracking;
     if (!t) return;
     const dist = this.haversineMeters(currentLat, currentLng, t.lat, t.lng);
+    Logger.add('info', `Rastreo: a ${Math.round(dist)} m de la parada ${t.pedidoId}`);
     if (dist <= ARRIVAL_RADIUS_METERS) {
-      const pedidoId = t.pedidoId;
-      await this.stopTracking();
       this.showToast(`¡Llegaste al destino (${Math.round(dist)} m)!`, 'success');
-      try {
-        await this.sbFetch(`pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
-          method: 'PATCH', body: { estado: 'entregado' }, prefer: 'return=minimal', parseJson: false,
-        });
-        const idx = this.state.asignaciones.findIndex(a => String(a.id) === String(pedidoId));
-        if (idx !== -1) this.state.asignaciones[idx].estado = 'entregado';
-        this.refreshMarkers();
-        this.render();
-      } catch (e) { }
+      await this.completeAssignment(t.pedidoId, { auto: true, distance: dist });
     }
   },
 
@@ -1013,9 +1553,26 @@ const App = {
     btn.textContent = 'Asignando…';
     try {
       const coords = this.parseCoords(pedido);
+      // Conserva el formato original de items (objeto o arreglo) y agrega los datos GPS.
+      const gpsMeta = {
+        tipo: 'gps',
+        lat: coords ? coords.lat : null,
+        lng: coords ? coords.lng : null,
+        direccion: pedido.direccion || null,
+        pedido_original_id: String(pedido.id),
+      };
+      let items;
+      if (Array.isArray(pedido.items)) {
+        items = [...pedido.items.filter(i => !(i && i.tipo === 'gps')), gpsMeta];
+      } else {
+        items = {
+          ...(pedido.items && typeof pedido.items === 'object' ? pedido.items : {}),
+          gps: gpsMeta,
+        };
+      }
       const patch = {
         chofer_id: driverId,
-        items: [{ tipo: 'gps', lat: coords ? coords.lat : null, lng: coords ? coords.lng : null, direccion: pedido.direccion || null, pedido_original_id: String(pedido.id) }],
+        items,
         ubicacion_chofer: coords ? `${coords.lat},${coords.lng}` : null,
       };
       await this.sbFetch(`pedidos?id=eq.${encodeURIComponent(pedidoId)}`, {
@@ -1076,12 +1633,14 @@ const App = {
     btn.textContent = 'Asignando…';
     try {
       const payload = {
-        id: 'gps-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        // La columna id es de tipo texto; generamos un identificador único para la asignación GPS.
+        id: 'gps-' + Date.now() + '-' + Math.floor(Math.random() * 100000),
         chofer_id: driverId,
         ubicacion_chofer: `${u.lat},${u.lng}`,
         direccion: `Ubicación GPS ${u.lat.toFixed(5)}, ${u.lng.toFixed(5)}`,
-        items: [{ tipo: 'gps', lat: u.lat, lng: u.lng }],
+        items: { gps: { tipo: 'gps', lat: u.lat, lng: u.lng } },
         monto_total: 0,
+        estado: 'pendiente',
       };
       await this.sbFetch('pedidos', { method: 'POST', body: payload, prefer: 'return=representation' });
       this.state.ubicaciones.splice(idx, 1);
@@ -1133,12 +1692,37 @@ const App = {
   saveUbicaciones() {
     localStorage.setItem(UBIC_KEY, JSON.stringify(this.state.ubicaciones.slice(-50)));
   },
-  addUbicacion(lat, lng) {
-    const u = { lat, lng, timestamp: Date.now() };
+  addUbicacion(lat, lng, meta = {}) {
+    const la = Number(lat);
+    const ln = Number(lng);
+    if (!isFinite(la) || !isFinite(ln) || la < -90 || la > 90 || ln < -180 || ln > 180 ||
+        (Math.abs(la) < 0.000001 && Math.abs(ln) < 0.000001)) {
+      Logger.add('error', `Ubicación inválida: ${lat}, ${lng}`);
+      this.showToast('Ubicación inválida', 'error');
+      return;
+    }
+
+    const now = Date.now();
+    const duplicate = this.state.ubicaciones.find(u =>
+      now - u.timestamp < 15000 && this.haversineMeters(u.lat, u.lng, la, ln) < 25
+    );
+    if (duplicate) {
+      Logger.add('warn', `Ubicación duplicada ignorada: ${la}, ${ln}`);
+      return;
+    }
+
+    const u = {
+      lat: la,
+      lng: ln,
+      timestamp: now,
+      fuente: meta.source || 'link',
+      url: meta.url || '',
+    };
     this.state.ubicaciones.push(u);
     this.saveUbicaciones();
     this.refreshMarkers();
-    if (this.state.map) this.state.map.setView([lat, lng], 15);
+    if (this.state.map) this.state.map.setView([la, ln], 15);
+    Logger.add('info', `Ubicación agregada: ${la}, ${ln} (${u.fuente})`);
     this.showToast('Ubicación recibida', 'success');
     if (this.state.role) this.render();
   },
@@ -1147,85 +1731,190 @@ const App = {
     try {
       if (window.Capacitor?.Plugins?.App) {
         const r = await window.Capacitor.Plugins.App.getLaunchUrl();
-        if (r?.url) await this.handleDeepLink(r.url);
+        if (r?.url) {
+          Logger.add('info', 'Launch URL: ' + r.url);
+          await this.handleDeepLink(r.url);
+        }
       }
-    } catch (e) { }
+    } catch (e) {
+      Logger.add('error', 'No se pudo leer el enlace de inicio: ' + (e.message || e));
+    }
   },
   setupDeepLinks() {
     try {
       if (window.Capacitor?.Plugins?.App) {
         window.Capacitor.Plugins.App.addListener('appUrlOpen', (d) => {
-          if (d?.url) this.handleDeepLink(d.url);
+          if (d?.url) {
+            Logger.add('info', 'appUrlOpen: ' + d.url);
+            this.handleDeepLink(d.url);
+          }
         });
       }
-    } catch (e) { }
+    } catch (e) {
+      Logger.add('error', 'No se pudo registrar appUrlOpen: ' + (e.message || e));
+    }
   },
 
-  parseMapsUrl(url) {
-    if (!url) return null;
-    try {
-      const decoded = decodeURIComponent(url);
-      let m = decoded.match(/geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
-      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-      m = decoded.match(/[?&]q=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
-      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-      m = decoded.match(/[?&]query=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
-      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-      m = decoded.match(/[?&]destination=\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
-      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-      m = decoded.match(/\/maps\/(?:@|place|search)\/?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
-      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-      m = decoded.match(/\/maps\/place\/[^/]*\/@\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
-      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-      m = decoded.match(/\/maps\/place\/[^/]+\/\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
-      if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
-      return null;
-    } catch { return null; }
-  },
-  async resolveShortMapsUrl(url) {
-    try {
-      const res = await fetch(url, { method: 'GET', redirect: 'follow' });
-      if (res.url && res.url !== url) {
-        return this.parseMapsUrl(res.url);
+  parseMapsUrl(raw) {
+    if (!raw) return null;
+    const original = String(raw).trim();
+    let decoded = original;
+    try { decoded = decodeURIComponent(original); } catch (e) { decoded = original; }
+    const sources = decoded === original ? [original] : [decoded, original];
+
+    const valid = (lat, lng) => {
+      const la = Number(lat);
+      const ln = Number(lng);
+      if (!isFinite(la) || !isFinite(ln)) return null;
+      if (la < -90 || la > 90 || ln < -180 || ln > 180) return null;
+      if (Math.abs(la) < 0.000001 && Math.abs(ln) < 0.000001) return null;
+      return { lat: la, lng: ln };
+    };
+
+    const patterns = [
+      /geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i,
+      /[?&](?:q|query|destination|ll|center|sll|daddr|saddr)=(-?\d+(?:\.\d+)?)\s*(?:%2C|,)\s*(-?\d+(?:\.\d+)?)/i,
+      /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/i,
+      /\/maps\/(?:place|search|dir)\/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i,
+      /@(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i,
+      /[?&]lat=(-?\d+(?:\.\d+)?)[^&]*&(?:lon|lng)=(-?\d+(?:\.\d+)?)/i,
+      /(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/,
+    ];
+
+    for (const text of sources) {
+      for (const re of patterns) {
+        const m = text.match(re);
+        if (!m) continue;
+        const coords = valid(m[1], m[2]);
+        if (coords) return coords;
       }
+      const swapped = text.match(/!2d(-?\d+(?:\.\d+)?)!3d(-?\d+(?:\.\d+)?)/i);
+      if (swapped) {
+        const coords = valid(swapped[2], swapped[1]);
+        if (coords) return coords;
+      }
+    }
+    return null;
+  },
+
+  async resolveShortMapsUrl(url) {
+    Logger.add('info', 'Resolviendo enlace corto: ' + url);
+
+    try {
+      const native = window.Capacitor?.Plugins?.MapsLink;
+      if (native && native.resolve) {
+        const res = await native.resolve({ url });
+        Logger.add('info', 'MapsLink nativo: ' + Logger.stringify(res));
+        if (res && res.lat != null && res.lng != null) {
+          return { lat: Number(res.lat), lng: Number(res.lng) };
+        }
+        if (res && res.error) Logger.add('error', 'MapsLink: ' + res.error);
+        return null;
+      }
+    } catch (e) {
+      Logger.add('error', 'MapsLink nativo falló: ' + (e.message || e));
+    }
+
+    try {
+      const options = { method: 'GET', redirect: 'follow' };
+      if (typeof AbortController !== 'undefined') {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 12000);
+        options.signal = controller.signal;
+      }
+      const res = await fetch(url, options);
+      Logger.add('info', `Enlace corto: HTTP ${res.status} ${res.url || ''}`);
+      const fromUrl = this.parseMapsUrl(res.url || '');
+      if (fromUrl) return fromUrl;
+
       const html = await res.text();
-      const ogMatch = html.match(/property=["']og:url["']\s+content=["']([^"']+)["']/i)
-                   || html.match(/rel=["']canonical["']\s+href=["']([^"']+)["']/i);
-      if (ogMatch) {
-        const parsed = this.parseMapsUrl(ogMatch[1]);
+      const og = html.match(/property=["']og:url["'][^>]*content=["']([^"']+)["']/i)
+        || html.match(/content=["']([^"']+)["'][^>]*property=["']og:url["']/i)
+        || html.match(/rel=["']canonical["'][^>]*href=["']([^"']+)["']/i);
+      if (og) {
+        const parsed = this.parseMapsUrl(og[1]);
         if (parsed) return parsed;
       }
-      return this.parseMapsUrl(res.url || '');
+      const fromHtml = this.parseMapsUrl(html.slice(0, 200000));
+      if (fromHtml) return fromHtml;
+      Logger.add('warn', 'El enlace corto no devolvió coordenadas');
+      return null;
     } catch (e) {
+      Logger.add('error', 'No se pudo resolver el enlace corto (red/CORS): ' + (e.message || e));
       return null;
     }
   },
-  async handleDeepLink(url) {
+
+  async handleDeepLink(url, meta = {}) {
     if (!url) return;
-    let coords = this.parseMapsUrl(url);
-    if (!coords && /(maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(url)) {
-      coords = await this.resolveShortMapsUrl(url);
-    }
-    if (!coords) {
-      this.showToast('No se pudo leer la ubicación del enlace', 'error');
+    Logger.add('info', 'Enlace recibido: ' + String(url).slice(0, 500));
+
+    if (meta && meta.lat != null && meta.lng != null) {
+      this.addUbicacion(Number(meta.lat), Number(meta.lng), {
+        source: meta.source || 'link',
+        url,
+      });
       return;
     }
-    this.addUbicacion(coords.lat, coords.lng);
+
+    let coords = this.parseMapsUrl(url);
+    if (coords) {
+      Logger.add('info', `Coordenadas del enlace: ${coords.lat}, ${coords.lng}`);
+      this.addUbicacion(coords.lat, coords.lng, { source: 'link', url });
+      return;
+    }
+
+    if (/(maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(url)) {
+      coords = await this.resolveShortMapsUrl(url);
+      if (coords) {
+        this.addUbicacion(coords.lat, coords.lng, { source: 'short-link', url });
+        return;
+      }
+    }
+
+    Logger.add('error', 'No se pudo leer la ubicación del enlace: ' + String(url).slice(0, 300));
+    this.showToast('No se pudo leer la ubicación. Abre el enlace en Google Maps y compártelo desde ahí.', 'error');
   },
 
   navigateTo(pedidoId, lat, lng) {
-    if (pedidoId && !String(pedidoId).startsWith('u') && lat != null && lng != null) {
-      this.startTracking(String(pedidoId), lat, lng);
+    const la = Number(lat);
+    const ln = Number(lng);
+    if (!isFinite(la) || !isFinite(ln)) {
+      this.showToast('La parada no tiene coordenadas', 'error');
+      return;
     }
-    const intentUrl = `google.navigation:q=${lat},${lng}`;
-    const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-    if (window.Capacitor?.Plugins?.App) {
-      try { window.open(intentUrl, '_system'); } catch { window.open(webUrl, '_system'); }
-    } else { window.open(webUrl, '_blank'); }
+
+    if (pedidoId && !String(pedidoId).startsWith('u')) {
+      this.startTracking(String(pedidoId), la, ln);
+    }
+
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${la},${ln}&travelmode=driving&dir_action=navigate`;
+    Logger.add('info', 'Abriendo Google Maps: ' + url);
+    this.openExternal(url);
   },
+
   navigateByAddress(direccion) {
-    const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
-    window.open(webUrl, '_blank');
+    const dir = String(direccion || '').trim();
+    if (!dir) {
+      this.showToast('No hay dirección para buscar', 'error');
+      return;
+    }
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dir)}&travelmode=driving`;
+    Logger.add('info', 'Abriendo Google Maps por dirección: ' + url);
+    this.openExternal(url);
+  },
+
+  openExternal(url) {
+    try {
+      if (window.Capacitor?.Plugins?.App) {
+        window.open(url, '_system');
+      } else {
+        window.open(url, '_blank');
+      }
+    } catch (e) {
+      Logger.add('error', 'No se pudo abrir el enlace externo: ' + (e.message || e));
+      this.showToast('No se pudo abrir Google Maps', 'error');
+    }
   },
 
   openNuevoChoferModal() {
@@ -1376,16 +2065,21 @@ const App = {
     }
     return this.state.ubicaciones.slice().reverse().map((u, revIdx) => {
       const realIdx = this.state.ubicaciones.length - 1 - revIdx;
+      const fuente = u.fuente === 'share' ? 'Compartida' : (u.fuente === 'short-link' ? 'Enlace corto' : 'Enlace');
       return `
         <div class="card">
           <div class="card-header">
             ${ICONS.pin}
             <h3>${u.lat.toFixed(5)}, ${u.lng.toFixed(5)}</h3>
+            <span class="badge gps" style="margin-left:auto">${fuente}</span>
           </div>
           <div class="meta">${ICONS.clock} ${new Date(u.timestamp).toLocaleString()}</div>
-          ${this.state.role === 'admin'
-            ? `<button class="btn accent" onclick="App.openAssignModal(${realIdx})">${ICONS.driver} Asignar a chofer</button>`
-            : `<button class="btn accent" onclick="App.navigateTo('u${realIdx}', ${u.lat}, ${u.lng})">${ICONS.nav} Navegar en Google Maps</button>`}
+          <div class="card-actions">
+            <button class="btn ghost" onclick="App.navigateTo('u${realIdx}', ${u.lat}, ${u.lng})">${ICONS.nav} Abrir en Maps</button>
+            ${this.state.role === 'admin'
+              ? `<button class="btn accent" onclick="App.openAssignModal(${realIdx})">${ICONS.driver} Asignar a chofer</button>`
+              : ''}
+          </div>
         </div>
       `;
     }).join('');
@@ -1398,42 +2092,91 @@ const App = {
     if (this.state.loadingAsignaciones && this.state.asignaciones.length === 0) {
       return `<div class="loading-box"><span class="spinner"></span>Cargando…</div>`;
     }
-    const activas = this.state.asignaciones.filter(a => {
-      const est = String(a.estado || '').toLowerCase();
-      return est !== 'entregado' && est !== 'completado' && est !== 'cancelado';
-    });
+
+    const activas = forAdmin ? this.getPendingAssignments() : this.getOrderedPendingAssignments();
     if (activas.length === 0) return `<p class="empty">Sin asignaciones pendientes</p>`;
-    return activas.map(a => {
+
+    return activas.map((a, idx) => {
       const coords = this.parseCoords(a);
       const chofer = this.state.choferes.find(c => String(c.id) === String(a.chofer_id));
       const nombreChofer = chofer ? chofer.nombre : (a.chofer_id ? 'Chofer' : 'Sin asignar');
       const fecha = a.created_at ? new Date(a.created_at).toLocaleString() : '';
-      const isTracking = this.state.tracking && this.state.tracking.pedidoId === String(a.id);
-      const coordsText = coords ? `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}` : (a.direccion || 'Sin ubicación');
+      const isTracking = this.state.tracking && String(this.state.tracking.pedidoId) === String(a.id);
+      const dist = this.assignmentDistance(a);
+      const isNext = !forAdmin && idx === 0;
+      const coordsText = this.describeAssignment(a);
+
       const navBtn = coords
-        ? `<button class="btn accent" onclick="App.navigateTo('${this.escape(String(a.id))}', ${coords.lat}, ${coords.lng})">${ICONS.nav} Navegar en Google Maps</button>`
-        : `<button class="btn accent" onclick="App.navigateByAddress('${this.escape(a.direccion || '')}')">${ICONS.nav} Buscar dirección en Google Maps</button>`;
+        ? `<button class="btn accent" onclick="App.navigateTo('${this.escape(String(a.id))}', ${coords.lat}, ${coords.lng})">${ICONS.nav} Navegar</button>`
+        : `<button class="btn accent" onclick="App.navigateByAddress('${this.escape(a.direccion || '')}')">${ICONS.nav} Buscar dirección</button>`;
       const verBtn = coords
-        ? `<button class="btn ghost" onclick="App.state.map.setView([${coords.lat}, ${coords.lng}], 16)">${ICONS.pin} Ver destino en el mapa</button>`
+        ? `<button class="btn ghost" onclick="App.state.map.setView([${coords.lat}, ${coords.lng}], 16)">${ICONS.pin} Ver en mapa</button>`
         : '';
+      const completeBtn = !forAdmin
+        ? `<button class="btn success" onclick="App.completeAssignment('${this.escape(String(a.id))}')">${ICONS.check} Entregado</button>`
+        : '';
+
       return `
-        <div class="card">
+        <div class="card stop-card ${isNext ? 'next' : ''}">
           <div class="card-header">
-            ${ICONS.gps}
+            <span class="order-badge ${isNext ? 'next' : ''}">${forAdmin ? ICONS.gps : idx + 1}</span>
             <h3>${this.escape(coordsText)}</h3>
-            <span class="badge ${isTracking ? 'track' : 'gps'}" style="margin-left:auto">${isTracking ? 'En camino' : 'GPS'}</span>
+            <span class="badge ${isNext ? 'activo' : (isTracking ? 'track' : 'gps')}" style="margin-left:auto">${isNext ? 'Siguiente' : (isTracking ? 'En camino' : 'Pendiente')}</span>
           </div>
+          ${!forAdmin && dist != null ? `<div class="meta">${ICONS.nav} <span class="distance-pill">${this.formatDistance(dist)}</span></div>` : ''}
           ${fecha ? `<div class="meta">${ICONS.clock} ${this.escape(fecha)}</div>` : ''}
           ${forAdmin ? `<div class="meta">${ICONS.driver} ${this.escape(nombreChofer)}</div>` : ''}
-          ${verBtn}
-          ${navBtn}
+          <div class="card-actions">
+            ${verBtn}
+            ${navBtn}
+            ${completeBtn}
+          </div>
           ${isTracking ? `<button class="btn ghost" onclick="App.stopTracking()">${ICONS.stop} Detener rastreo</button>` : ''}
-          ${!forAdmin ? `<button class="btn success" onclick="App.completarAsignacion('${this.escape(String(a.id))}')">
-            ${ICONS.check} Marcar completada
-          </button>` : ''}
         </div>
       `;
     }).join('');
+  },
+
+  renderDeliveredList(forAdmin = false) {
+    const delivered = this.getDeliveredAssignments()
+      .slice()
+      .sort((a, b) => this.assignmentTime(b) - this.assignmentTime(a));
+    if (delivered.length === 0) {
+      return `<p class="empty">Todavía no hay paradas entregadas</p>`;
+    }
+    return delivered.slice(0, 50).map(a => {
+      const chofer = this.state.choferes.find(c => String(c.id) === String(a.chofer_id));
+      const name = forAdmin && chofer ? chofer.nombre : '';
+      const when = a.updated_at || a.created_at;
+      return `<div class="delivered-row">
+        ${ICONS.check}
+        <span class="delivered-text">${this.escape(this.describeAssignment(a))}${name ? ' · ' + this.escape(name) : ''}</span>
+        <span class="delivered-time">${when ? this.formatRelativeTime(when) : ''}</span>
+      </div>`;
+    }).join('');
+  },
+
+  renderAdminProgress() {
+    if (this.state.asignaciones.length === 0) return '';
+    const groups = new Map();
+    this.state.asignaciones.forEach(a => {
+      const key = a.chofer_id ? String(a.chofer_id) : '__none__';
+      if (!groups.has(key)) groups.set(key, { pending: 0, done: 0 });
+      const g = groups.get(key);
+      if (this.isAssignmentDone(a)) g.done++;
+      else g.pending++;
+    });
+    return `<div class="route-summary" style="padding:12px 14px">${Array.from(groups.entries()).map(([id, g]) => {
+      const chofer = this.state.choferes.find(c => String(c.id) === String(id));
+      const name = chofer ? chofer.nombre : (id === '__none__' ? 'Sin asignar' : 'Chofer');
+      const total = g.pending + g.done;
+      const pct = total ? Math.round((g.done / total) * 100) : 0;
+      return `<div class="driver-progress">
+        <span class="name">${this.escape(name)}</span>
+        <span class="mini-bar"><span style="width:${pct}%"></span></span>
+        <span class="counts">${g.done}/${total}</span>
+      </div>`;
+    }).join('')}</div>`;
   },
 
   renderAdmin() {
@@ -1442,6 +2185,9 @@ const App = {
       const est = String(p.estado || '').toLowerCase();
       return est !== 'entregado' && est !== 'completado' && est !== 'cancelado';
     });
+    const pendingAsig = this.getPendingAssignments();
+    const deliveredAsig = this.getDeliveredAssignments();
+
     return `
       <div class="panel-title">
         ${ICONS.driver} Choferes
@@ -1463,12 +2209,29 @@ const App = {
         ${ICONS.pin} Ubicaciones recibidas
         <span class="count">${this.state.ubicaciones.length}</span>
       </div>
+      <p class="route-hint">
+        Comparte un enlace de Google Maps a <strong>Agua Rutas</strong> desde el menú Compartir.
+        La app resuelve los enlaces cortos automáticamente. También puedes abrirlo aquí para verificarlo.
+      </p>
       ${this.renderUbicacionesList()}
 
       <div class="panel-title">
-        ${ICONS.gps} Asignaciones a choferes
-        <span class="count">${this.state.asignaciones.length}</span>
+        ${ICONS.gps} Rutas de choferes
+        <span class="count">${pendingAsig.length} pendientes</span>
         <button class="refresh-btn" onclick="App.loadAsignacionesFromSupabase()">${ICONS.refresh} Actualizar</button>
+      </div>
+      ${this.renderAdminProgress()}
+
+      <div class="panel-title" style="margin-top:20px">
+        ${ICONS.check} Entregados
+        <span class="count">${deliveredAsig.length}</span>
+        <button class="refresh-btn" onclick="App.toggleDelivered()">${this.state.showDelivered ? 'Ocultar' : 'Ver'}</button>
+      </div>
+      ${this.state.showDelivered ? this.renderDeliveredList(true) : ''}
+
+      <div class="panel-title" style="margin-top:20px">
+        ${ICONS.gps} Asignaciones pendientes
+        <span class="count">${pendingAsig.length}</span>
       </div>
       ${this.renderAsignacionesList(true)}
     `;
@@ -1476,6 +2239,16 @@ const App = {
 
   renderDriver() {
     const hasSelf = this.state.myLat != null && this.state.myLng != null;
+    const pending = this.getPendingAssignments();
+    const ordered = this.getOrderedPendingAssignments();
+    const next = ordered[0] || null;
+    const delivered = this.getDeliveredAssignments();
+    const done = delivered.filter(a => this.isTodayAssignment(a)).length;
+    const total = pending.length + done;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    const nextCoords = next ? this.parseCoords(next) : null;
+    const nextDist = next ? this.assignmentDistance(next) : null;
+
     const selfCard = `
       <div class="card self-card">
         <div class="card-header">
@@ -1491,24 +2264,74 @@ const App = {
              <button class="btn ghost" onclick="App.centerOnDrivers()">${ICONS.nav} Reintentar</button>`}
       </div>
     `;
+
+    const routeCard = `
+      <div class="route-summary">
+        <div class="route-summary-top">
+          <div>
+            <div class="route-summary-label">Ruta de hoy</div>
+            <div class="route-summary-title">${done} de ${total} entregados</div>
+          </div>
+          <span class="badge ${pending.length ? 'asignado' : (total ? 'entregado' : 'gps')}">
+            ${pending.length ? pending.length + ' pendientes' : (total ? 'Completada' : 'Sin paradas')}
+          </span>
+        </div>
+        <div class="route-progress"><div class="route-progress-bar" style="width:${pct}%"></div></div>
+        ${next ? `
+          <div class="next-stop">
+            <div class="next-stop-label">${ICONS.nav} Siguiente parada</div>
+            <div class="next-stop-title">${this.escape(this.describeAssignment(next))}</div>
+            <div class="next-stop-meta">
+              ${nextDist != null ? this.formatDistance(nextDist) + ' de distancia · ' : ''}
+              ${pending.length} parada${pending.length === 1 ? '' : 's'} en la ruta
+            </div>
+            <div class="next-stop-actions">
+              ${nextCoords
+                ? `<button class="btn accent" onclick="App.navigateTo('${this.escape(String(next.id))}', ${nextCoords.lat}, ${nextCoords.lng})">${ICONS.nav} Navegar</button>`
+                : `<button class="btn accent" onclick="App.navigateByAddress('${this.escape(next.direccion || '')}')">${ICONS.nav} Buscar dirección</button>`}
+              <button class="btn success" onclick="App.completeAssignment('${this.escape(String(next.id))}')">${ICONS.check} Entregado</button>
+            </div>
+          </div>
+        ` : total > 0 ? `
+          <div class="route-done">¡Ruta completada!<small>No quedan paradas pendientes. Buen trabajo.</small></div>
+        ` : `
+          <div class="route-done" style="background:var(--bg-soft);border-color:var(--line);color:var(--ink-soft)">
+            Sin paradas asignadas
+            <small>El administrador te asignará ubicaciones.</small>
+          </div>
+        `}
+      </div>
+    `;
+
     return `
       ${selfCard}
+      ${routeCard}
 
       <div class="panel-title">
-        ${ICONS.gps} Mis asignaciones
-        <span class="count">${this.state.asignaciones.length}</span>
+        ${ICONS.gps} Paradas de la ruta
+        <span class="count">${pending.length}</span>
         <button class="refresh-btn" onclick="App.loadAsignacionesFromSupabase()">${ICONS.refresh} Actualizar</button>
       </div>
-      <p class="empty" style="text-align:left;padding:0 0 10px">
-        Al tocar "Navegar" se activa el rastreo. Cuando estés a ${ARRIVAL_RADIUS_METERS} m del destino, el pedido se marcará como entregado automáticamente.
+      <p class="route-hint">
+        La primera parada es la más cercana a tu ubicación actual. Al marcarla como entregada,
+        su pin desaparece y el siguiente punto más cercano pasa a ser la nueva parada.
       </p>
       ${this.renderAsignacionesList(false)}
 
       <div class="panel-title" style="margin-top:20px">
-        ${ICONS.pin} Ubicaciones recibidas (local)
-        <span class="count">${this.state.ubicaciones.length}</span>
+        ${ICONS.check} Entregados
+        <span class="count">${delivered.length}</span>
+        <button class="refresh-btn" onclick="App.toggleDelivered()">${this.state.showDelivered ? 'Ocultar' : 'Ver'}</button>
       </div>
-      ${this.renderUbicacionesList()}
+      ${this.state.showDelivered ? this.renderDeliveredList(false) : ''}
+
+      ${this.state.ubicaciones.length ? `
+        <div class="panel-title" style="margin-top:20px">
+          ${ICONS.pin} Enlaces recibidos
+          <span class="count">${this.state.ubicaciones.length}</span>
+        </div>
+        ${this.renderUbicacionesList()}
+      ` : ''}
     `;
   },
 
