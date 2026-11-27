@@ -5,8 +5,9 @@
   "description": "App de rutas para distribuidora de agua",
   "scripts": {
     "sync": "npx cap sync android",
-    "patch": "node scripts/patch-manifest.js",
-    "apk": "npm run sync && npm run patch && cd android && chmod +x gradlew && ./gradlew assembleDebug"
+    "patch": "node scripts/patch-manifest.js && node scripts/patch-main-activity.js",
+    "apk": "npm run sync && npm run patch && cd android && chmod +x gradlew && ./gradlew assembleDebug",
+    "apk:win": "npm run sync && npm run patch && cd android && gradlew.bat assembleDebug"
   },
   "dependencies": {
     "@capacitor/android": "^6.1.0",
